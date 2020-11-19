@@ -17,6 +17,7 @@ pub struct HealthChanged(pub UnitHealth);
 pub enum UnitCmd {
     SetPosition(Position),
     SetHealth(UnitHealth),
+    ExecuteAction(u16, Position)
 }
 
 

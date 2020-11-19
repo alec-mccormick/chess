@@ -3,6 +3,7 @@ pub mod events;
 pub mod action;
 
 pub use types::*;
+pub use action::{UnitAction, UnitActions};
 
 
 use crate::prelude::*;

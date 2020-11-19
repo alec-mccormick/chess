@@ -13,7 +13,8 @@ use super::entity::{ObjectId, EntityStore};
 
 /// Plugin to add in a message type.
 ///
-/// This plugin registers the event type with both id types and adds in a system to map it from unit_id -> Entity.
+/// This plugin registers events with both id types and adds in a system to map it from object_id -> Entity.
+///
 #[derive(Debug, Default, Copy, Clone)]
 pub struct EventPlugin<T> {
     _marker: PhantomData<T>

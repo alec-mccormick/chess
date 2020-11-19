@@ -6,7 +6,8 @@ use crate::prelude::*;
 
 
 
-
+/// Components
+///
 #[derive(Debug, Copy, Clone)]
 pub enum UnitType {
     Pawn,
@@ -15,7 +16,6 @@ pub enum UnitType {
 
 #[derive(Debug, Copy, Clone, From, Into, Deref)]
 pub struct UnitHealth(pub u32);
-
 
 #[derive(Debug, Clone, From, Into, Deref)]
 pub struct UnitTeam(pub String);
