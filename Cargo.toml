@@ -1,0 +1,13 @@
+[package]
+name = "chess"
+version = "0.1.0"
+authors = ["alec-mccormick <alec.s.mccormick@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = "0.3"
+rand = "0.7"
+
+derive_more = "0.99.11"
