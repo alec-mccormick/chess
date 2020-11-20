@@ -9,20 +9,26 @@ pub use action::{UnitAction, UnitActions, UnitActionPlugin};
 pub use cmd::{UnitCmd, UnitCmdPlugin};
 
 
-use bevy::prelude::*;
+use bevy::{prelude::*, app::PluginGroupBuilder};
 
+#[derive(Bundle)]
+pub struct UnitComponents {
+    pub unit_type: UnitType,
+    pub health: UnitHealth,
+    pub team: UnitTeam,
+    pub actions: UnitActions,
+}
 
 
 #[derive(Debug, Default)]
-pub struct UnitPlugin;
+pub struct UnitPlugins;
 
-impl Plugin for UnitPlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app
-            .add_plugin(UnitComponentsPlugin)
-            .add_plugin(UnitActionPlugin)
-            .add_plugin(UnitCmdPlugin)
-            .add_plugin(UnitStorePlugin)
+impl PluginGroup for UnitPlugins {
+    fn build(&mut self, group: &mut PluginGroupBuilder) {
+        group.add(UnitComponentsPlugin)
+            .add(UnitActionPlugin)
+            .add(UnitCmdPlugin)
+            .add(UnitStorePlugin)
         ;
     }
 }

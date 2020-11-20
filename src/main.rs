@@ -9,8 +9,16 @@ use bevy::prelude::*;
 
 fn main() {
     App::build()
-        // .add_plugins(DefaultPlugins)
-        .add_plugins(MinimalPlugins)
-        .add_plugin(BattlePlugin::default())
+        .add_resource(WindowDescriptor {
+            title: "Chess".to_string(),
+            width: 1680,
+            height: 1050,
+            vsync: true,
+            resizable: false,
+            ..Default::default()
+        })
+        .add_plugins(DefaultPlugins)
+        // .add_plugins(MinimalPlugins)
+        .add_plugin(BattlePlugin)
         .run();
 }

@@ -11,10 +11,19 @@ pub fn spawn(commands: &mut Commands, object_id: ObjectId, position: Position, t
         UnitType::Pawn,
         object_id.clone(),
         position,
-        team,
+        team.clone(),
         UnitHealth(1),
-        UnitActions(vec![Box::new(PawnMoveAction)])
+        UnitActions(vec![Box::new(PawnMoveAction)]),
+        SpriteConfig { src: get_sprite_src(team) }
     ));
+}
+
+fn get_sprite_src(team: UnitTeam) -> String {
+    return if team.eq("White".into()) {
+        "whitePawn.png".into()
+    } else {
+        "blackPawn.png".into()
+    }
 }
 
 
@@ -50,7 +59,7 @@ impl UnitAction for PawnMoveAction {
     ) -> Box<dyn Iterator<Item=(ObjectId, UnitCmd)>> {
 
         let &object_id = query.get_component::<ObjectId>(*entity).unwrap();
-        let &position = query.get_component::<Position>(*entity).unwrap();
+        // let &position = query.get_component::<Position>(*entity).unwrap();
 
         let commands: Vec<(ObjectId, UnitCmd)> = vec![
             (object_id, UnitCmd::SetPosition(target))
@@ -63,13 +72,13 @@ impl UnitAction for PawnMoveAction {
 fn list_pawn_move_targets(store: &Res<UnitStore>, position: &Position, step: i32, home_row: i32) -> Vec<Position> {
     let mut results: Vec<Position> = vec![];
 
-    let mut next = position.add(pos(0, step));
+    let mut next = position.add(Position::new(0, step));
 
     if store.is_position_empty(&next) {
         results.push(next.clone());
 
         if position.y == home_row {
-            next = next.add(pos(0, step));
+            next = next.add(Position::new(0, step));
 
             if store.is_position_empty(&next) {
                 results.push(next.clone());

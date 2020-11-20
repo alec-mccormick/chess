@@ -7,6 +7,12 @@ pub struct Position {
     pub y: i32,
 }
 
+impl Position {
+    pub fn new(x: i32, y: i32) -> Self {
+        Position { x, y }
+    }
+}
+
 impl Add for Position {
     type Output = Self;
 
@@ -15,6 +21,6 @@ impl Add for Position {
     }
 }
 
-pub fn pos(x: i32, y: i32) -> Position {
-    Position { x, y }
-}
+// pub fn pos(x: i32, y: i32) -> Position {
+//     Position { x, y }
+// }

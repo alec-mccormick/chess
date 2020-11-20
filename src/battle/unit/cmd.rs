@@ -1,7 +1,6 @@
 use bevy::{app::Events, prelude::*};
-use std::marker::PhantomData;
 use crate::prelude::*;
-use super::components::{self, UnitHealth, UnitType, UnitTeam};
+use super::components::{self, UnitHealth};
 use super::store::{UnitStore};
 use super::action::{self, UnitActions};
 
