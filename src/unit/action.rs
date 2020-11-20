@@ -1,4 +1,3 @@
-use std::collections::{HashMap};
 use bevy::{prelude::*};
 use derive_more::{From, Into, Deref};
 
@@ -9,17 +8,17 @@ use super::components::{UnitType, UnitTeam, UnitHealth};
 
 type ActionError = String;  // TODO
 
-#[derive(Debug, Clone, From, Into, Deref)]
-pub struct UnitActions(Vec<dyn UnitAction>);
+#[derive(From, Into, Deref)]
+pub struct UnitActions(pub Vec<Box<dyn UnitAction + Send + Sync>>);
 
 
-#[derive(Debug, Clone)]
-pub struct UnitActionExecuted(u16, Position);
+#[derive(Debug, Clone, Copy)]
+pub struct UnitActionExecuted(pub usize, pub Position);
 
 
 impl UnitActions {
 
-    pub fn get(&self, index: u16) -> Result<impl UnitAction, ActionError> {
+    pub fn get(&self, index: usize) -> Result<&Box<dyn UnitAction + Send + Sync>, ActionError> {
         self.0.get(index).ok_or(String::from("Error"))
     }
 }
@@ -28,17 +27,19 @@ impl UnitActions {
 pub trait UnitAction {
     
     fn list_targets(
-        entity: Entity,
-        store: &UnitStore,
+        &self,
+        entity: &Entity,
+        store: &Res<UnitStore>,
         query: &Query<(&ObjectId, &Position, &UnitType, &UnitTeam, &UnitHealth, &UnitActions)>
-    ) -> dyn Iterator<Item = Position>;
+    ) -> Box<dyn Iterator<Item = Position>>;
 
     fn execute(
-        entity: Entity,
+        &self,
+        entity: &Entity,
         target: &Position,
         store: &Res<UnitStore>,
         query: &Query<(&ObjectId, &Position, &UnitType, &UnitTeam, &UnitHealth, &UnitActions)>
-    ) -> dyn Iterator<Item = (ObjectId, super::cmd::UnitCmd)>;
+    ) -> Box<dyn Iterator<Item = (ObjectId, super::cmd::UnitCmd)>>;
 }
 
 
@@ -61,13 +62,13 @@ impl UnitActionPlugin {
         mut reader: Local<EventReader<(Entity, UnitActionExecuted)>>,
         events: Res<Events<(Entity, UnitActionExecuted)>>,
         store: Res<UnitStore>,
-        query: Query<(&ObjectId, &Position, &UnitType, &UnitTeam, &UnitHealth, &UnitActions)>,
         mut cmd_events: ResMut<Events<(ObjectId, super::cmd::UnitCmd)>>,
+        query: Query<(&ObjectId, &Position, &UnitType, &UnitTeam, &UnitHealth, &UnitActions)>,
     ) {
         for (entity, action) in reader.iter(&events) {
             let (index, pos) = (action.0, action.1);
 
-            let &actions = query.get_component::<UnitActions>(entity).unwrap();
+            let actions = query.get_component::<UnitActions>(*entity).unwrap();
 
             let action = actions.get(index).unwrap();
 

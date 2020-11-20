@@ -2,6 +2,7 @@ use std::collections::{HashMap};
 use bevy::prelude::*;
 
 use crate::prelude::*;
+use super::components;
 
 
 /// UnitStorage
@@ -70,8 +71,8 @@ impl Plugin for UnitStorePlugin {
 impl UnitStorePlugin {
 
     fn handle_position_changed(
-        mut reader: Local<EventReader<(ObjectId, events::PositionChanged)>>,
-        events: Res<Events<(ObjectId, events::PositionChanged)>>,
+        mut reader: Local<EventReader<(ObjectId, components::events::PositionChanged)>>,
+        events: Res<Events<(ObjectId, components::events::PositionChanged)>>,
         mut store: ResMut<UnitStore>
     ) {
         for (id, event) in reader.iter(&events) {

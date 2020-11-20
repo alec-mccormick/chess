@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use crate::prelude::*;
 
-use crate::unit::{self, UnitType, UnitHealth, UnitStore, UnitTeam, UnitPlugin};
+use crate::unit::{self, UnitType, UnitHealth, UnitStore, UnitTeam, UnitPlugin, UnitActions};
 
 
 #[derive(Debug, Default)]
@@ -34,38 +34,14 @@ fn init_units(mut commands: Commands, mut events: ResMut<Events<entity::events::
 
     let object_id = ObjectId(id);
 
-    commands
-        .spawn((
-            UnitType::Pawn,
-            object_id.clone(),
-            Position::new(0, 0),
-            UnitTeam("White".into()),
-            UnitHealth(1),
-        ));
+    let white = UnitTeam("White".into());
+    // let black = UnitTeam("black".into());
+
+    crate::units::pawn::spawn(&mut commands, object_id,pos(0, 0), white.clone());
 
     let entity = commands.current_entity().unwrap();
     events.send(entity::events::EntitySpawned(object_id, entity));
 }
-
-
-
-
-// fn handle_pawn_move(
-//     entity: Entity,
-//     target: Position,
-//     query: Query<(&ObjectId, &Position, &UnitType, &UnitTeam, &UnitHealth)>
-// ) -> impl Iterator<Item = (ObjectId, unit::events::UnitCmd)> {
-//
-//     let (&unit_id, &position) = query.get(entity).unwrap();
-//
-//     let results: Vec<(ObjectId, unit::events::UnitCmd)> = vec![
-//         (unit_id, unit::events::UnitCmd::SetPosition(target))
-//     ];
-//
-//     results.into_iter()
-// }
-//
-
 
 
 
@@ -94,7 +70,8 @@ impl Default for GreetTimer {
 fn fire_event(
     time: Res<Time>,
     mut timer: Local<GreetTimer>,
-    mut unit_events: ResMut<Events<(ObjectId, unit::cmd::PositionChanged)>>
+    // mut unit_events: ResMut<Events<(ObjectId, unit::components::events::PositionChanged)>>,
+    mut events: ResMut<Events<(ObjectId, unit::UnitCmd)>>
 ) {
     // update our timer with the time elapsed since the last update
     timer.0.tick(time.delta_seconds);
@@ -106,7 +83,8 @@ fn fire_event(
         let id: u32 = 596260031;
         let id = ObjectId(id);
 
-        unit_events.send((id, unit::cmd::PositionChanged(Position::new(0, 2))));
+        let event = unit::UnitCmd::ExecuteAction(0, pos(0, 2));
+        events.send((id, event));
     }
 }
 

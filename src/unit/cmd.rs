@@ -13,7 +13,7 @@ use super::action::{self, UnitActions};
 pub enum UnitCmd {
     SetPosition(Position),
     SetHealth(UnitHealth),
-    ExecuteAction(u16, Position)
+    ExecuteAction(usize, Position)
 }
 
 
@@ -26,7 +26,7 @@ pub struct UnitCmdPlugin;
 impl Plugin for UnitCmdPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
-            .add_plugin(EventPlugin::<UnitCmd>::new())
+            .add_event::<(ObjectId, UnitCmd)>()
             .add_system(UnitCmdPlugin::handle_unit_command.system())
         ;
     }
@@ -44,13 +44,13 @@ impl UnitCmdPlugin {
         for (id, cmd) in reader.iter(&events) {
             match cmd {
                 UnitCmd::SetPosition(pos) => {
-                    pos_events.send((id, components::events::PositionChanged(pos)))
+                    pos_events.send((*id, components::events::PositionChanged(*pos)))
                 },
                 UnitCmd::SetHealth(health) => {
-                    health_events.sent((id, components::events::HealthChanged(health)))
+                    health_events.send((*id, components::events::HealthChanged(*health)))
                 },
                 UnitCmd::ExecuteAction(index, pos) => {
-                    action_events.send((id, action::UnitActionExecuted(index, pos)))
+                    action_events.send((*id, action::UnitActionExecuted(*index, *pos)))
                 }
             };
         }

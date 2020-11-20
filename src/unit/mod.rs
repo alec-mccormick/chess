@@ -1,5 +1,5 @@
 mod store;
-mod components;
+pub mod components;
 pub mod cmd;
 pub mod action;
 
@@ -8,7 +8,7 @@ pub use store::{UnitStore, UnitStorePlugin};
 pub use action::{UnitAction, UnitActions, UnitActionPlugin};
 pub use cmd::{UnitCmd, UnitCmdPlugin};
 
-use crate::prelude::*;
+
 use bevy::prelude::*;
 
 
