@@ -1,33 +1,17 @@
 use std::collections::{HashMap};
-use bevy::{prelude::*};
-use derive_more::{From, Into, Deref};
+use bevy::prelude::*;
 
 use crate::prelude::*;
 
 
-
-/// Components
+/// UnitStorage
 ///
-#[derive(Debug, Copy, Clone)]
-pub enum UnitType {
-    Pawn,
-}
-
-
-#[derive(Debug, Copy, Clone, From, Into, Deref)]
-pub struct UnitHealth(pub u32);
-
-#[derive(Debug, Clone, From, Into, Deref)]
-pub struct UnitTeam(pub String);
-
-
-
-
 #[derive(Debug, Default)]
 pub struct UnitStore {
     unit_id_to_position: HashMap<ObjectId, Position>,
     position_to_unit_id: HashMap<Position, ObjectId>,
 }
+
 
 impl UnitStore {
 
@@ -61,7 +45,51 @@ impl UnitStore {
             self.unit_id_to_position.remove(&unit_id);
         }
     }
+
+    pub fn is_position_empty(&self, position: &Position) -> bool {
+        self.position_to_unit_id.get(position).is_none()
+    }
 }
 
 
 
+
+#[derive(Debug, Default)]
+pub struct UnitStorePlugin;
+
+impl Plugin for UnitStorePlugin {
+    fn build(&self, app: &mut AppBuilder) {
+        app
+            .add_resource(UnitStore::default())
+            .add_system(UnitStorePlugin::handle_position_changed.system())
+            .add_system(UnitStorePlugin::handle_entity_spawned.system());
+    }
+}
+
+
+impl UnitStorePlugin {
+
+    fn handle_position_changed(
+        mut reader: Local<EventReader<(ObjectId, events::PositionChanged)>>,
+        events: Res<Events<(ObjectId, events::PositionChanged)>>,
+        mut store: ResMut<UnitStore>
+    ) {
+        for (id, event) in reader.iter(&events) {
+            store.set_position(*id, event.0);
+        }
+    }
+
+    fn handle_entity_spawned(
+        mut spawned_reader: Local<EventReader<entity::events::EntitySpawned>>,
+        spawned_events: Res<Events<entity::events::EntitySpawned>>,
+        mut store: ResMut<UnitStore>,
+        query: Query<(&Position)>,
+    ) {
+        for event in spawned_reader.iter(&spawned_events) {
+            let (object_id, entity) = (event.0, event.1);
+
+            let &position = query.get(entity).unwrap();
+            store.set_position(object_id, position);
+        }
+    }
+}

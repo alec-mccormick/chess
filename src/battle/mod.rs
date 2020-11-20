@@ -94,7 +94,7 @@ impl Default for GreetTimer {
 fn fire_event(
     time: Res<Time>,
     mut timer: Local<GreetTimer>,
-    mut unit_events: ResMut<Events<(ObjectId, unit::events::PositionChanged)>>
+    mut unit_events: ResMut<Events<(ObjectId, unit::cmd::PositionChanged)>>
 ) {
     // update our timer with the time elapsed since the last update
     timer.0.tick(time.delta_seconds);
@@ -106,7 +106,7 @@ fn fire_event(
         let id: u32 = 596260031;
         let id = ObjectId(id);
 
-        unit_events.send((id, unit::events::PositionChanged(Position::new(0, 2))));
+        unit_events.send((id, unit::cmd::PositionChanged(Position::new(0, 2))));
     }
 }
 
