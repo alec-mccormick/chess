@@ -1,11 +1,12 @@
-use bevy::{prelude::*, app::Events};
+pub mod unit;
 
+use bevy::{prelude::*, app::Events};
 use rand::{self, Rng};
 use std::collections::HashMap;
 
 use crate::prelude::*;
 
-use crate::unit::{self, UnitType, UnitHealth, UnitStore, UnitTeam, UnitPlugin, UnitActions};
+use unit::{UnitType, UnitHealth, UnitStore, UnitTeam, UnitPlugin, UnitActions};
 
 
 #[derive(Debug, Default)]
@@ -70,7 +71,7 @@ impl Default for GreetTimer {
 fn fire_event(
     time: Res<Time>,
     mut timer: Local<GreetTimer>,
-    // mut unit_events: ResMut<Events<(ObjectId, unit::components::events::PositionChanged)>>,
+    // mut unit_events: ResMut<Events<(ObjectId, battle.unit::components::events::PositionChanged)>>,
     mut events: ResMut<Events<(ObjectId, unit::UnitCmd)>>
 ) {
     // update our timer with the time elapsed since the last update

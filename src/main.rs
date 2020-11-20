@@ -1,6 +1,5 @@
 mod battle;
 mod prelude;
-mod unit;
 mod units;
 
 use battle::BattlePlugin;
