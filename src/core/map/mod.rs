@@ -18,11 +18,8 @@ pub enum Tile {
 }
 
 
-
-
 #[derive(Debug, Clone)]
 pub struct MapPlugin;
-
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut AppBuilder) {
@@ -31,7 +28,6 @@ impl Plugin for MapPlugin {
         ;
     }
 }
-
 
 fn setup(mut commands: Commands) {
     for x in 0..8 {
