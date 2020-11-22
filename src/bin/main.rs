@@ -1,10 +1,6 @@
-mod battle;
-mod prelude;
-mod units;
-
-use battle::BattlePlugin;
 use bevy::prelude::*;
 
+use chess::battle::BattlePlugin;
 
 
 fn main() {

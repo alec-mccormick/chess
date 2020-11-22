@@ -1,5 +1,7 @@
 pub mod unit;
 pub mod graphics;
+pub mod ui;
+pub mod map;
 
 use bevy::{prelude::*, app::Events};
 use rand::{self, Rng};
@@ -18,35 +20,16 @@ impl Plugin for BattlePlugin {
 
         app.add_plugin(EntityPlugin)
             .add_plugins(UnitPlugins)
+            .add_plugin(map::MapPlugin)
             .add_plugin(graphics::GraphicsPlugin)
+            .add_plugin(ui::UIPlugin)
             .add_startup_system(init_units.system())
             // .add_startup_system(setup_sprites.system())
             // .add_system(print_positions.system())
-            .add_system(fire_event.system())
+            // .add_system(fire_event.system())
         ;
     }
 }
-
-
-// fn setup_sprites(
-//     mut commands: Commands,
-//     asset_server: Res<AssetServer>,
-//     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-// ) {
-//     let texture_handle = asset_server.load("chess-pieces.png");
-//     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(200.0, 200.0), 6, 2);
-//     let texture_atlas_handle = texture_atlases.add(texture_atlas);
-//
-//     commands
-//         .spawn(Camera2dComponents::default())
-//         .spawn(SpriteSheetComponents {
-//             texture_atlas: texture_atlas_handle,
-//             // transform: Transform::from_scale(Vec3::splat(1.0)),
-//             ..Default::default()
-//         })
-//         .with(Timer::from_seconds(0.1, true));
-// }
-
 
 
 
