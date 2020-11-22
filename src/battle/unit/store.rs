@@ -50,6 +50,10 @@ impl UnitStore {
     pub fn is_position_empty(&self, position: &Position) -> bool {
         self.position_to_unit_id.get(position).is_none()
     }
+
+    pub fn get_unit_by_position(&self, position: &Position) -> Option<&ObjectId> {
+        self.position_to_unit_id.get(position)
+    }
 }
 
 

@@ -1,3 +1,6 @@
+mod tile;
+
+
 use bevy::prelude::*;
 use crate::prelude::*;
 
@@ -12,11 +15,11 @@ impl Plugin for UIPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
             .add_system(sprite_interaction_system.system())
-            .add_system(button_system.system())
+            .add_plugin(tile::TileUIPlugin)
         ;
-
     }
 }
+
 
 
 #[derive(Default)]
@@ -25,27 +28,6 @@ struct State {
     cursor_position: Vec2,
     hovered_entity: Option<Entity>,
 }
-
-fn button_system(
-    mut interaction_query: Query<With<map::Tile, (Mutated<Interaction>, &Position)>>,
-    // mut text_query: Query<&mut Text>,
-) {
-    for (interaction, position) in interaction_query.iter_mut() {
-
-        match *interaction {
-            Interaction::Clicked => {
-                println!("Pressed! {:?}", position);
-            }
-            Interaction::Hovered => {
-                println!("Hover {:?}", position);
-            }
-            Interaction::None => {
-                println!("None {:?}", position);
-            }
-        }
-    }
-}
-
 
 fn sprite_interaction_system(
     mut state: Local<State>,
