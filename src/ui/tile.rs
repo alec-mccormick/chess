@@ -47,10 +47,12 @@ pub fn tile_interface_system(
                 match store.state {
                     InterfaceState::Default => {
                         if let Some(entity) = unit_store.get_unit(position) {
+                            println!("Unit selected!");
                             store.state = InterfaceState::UnitSelected(*entity);
                         }
                     },
                     InterfaceState::UnitSelected(entity) => {
+                        println!("execute action!");
                         cmds.send((entity, UnitCmd::ExecuteAction(0, *position)));
                     }
                 }

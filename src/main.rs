@@ -16,7 +16,7 @@ fn main() {
             title: "Chess".to_string(),
             width: 1680,
             height: 1050,
-            vsync: true,
+            vsync: false,
             resizable: false,
             ..Default::default()
         })

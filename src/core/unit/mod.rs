@@ -32,6 +32,7 @@ fn handle_unit_cmd_system(
     mut query: Query<(&mut Position, &mut Health)>
 ) {
     for (entity, cmd) in reader.iter(&events) {
+        println!("handle_unit_cmd() {:?}", cmd);
 
         match cmd {
             UnitCmd::SetPosition(pos) => {

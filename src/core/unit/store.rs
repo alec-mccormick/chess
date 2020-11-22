@@ -46,6 +46,9 @@ impl UnitStore {
     }
 
     pub fn get_unit(&self, position: &Position) -> Option<&Entity> {
+        println!("get_unit() {:?}", position);
+        println!("{:?}", self.position_to_unit_id);
+
         self.position_to_unit_id.get(position)
     }
 }
