@@ -1,4 +1,4 @@
-use crate::battle::unit::{UnitAction, UnitCmd, UnitStore, UnitType, UnitTeam, UnitHealth, UnitActions};
+use crate::core::unit::{Action, UnitCmd, UnitStore, Unit, Team, Health, Actions};
 use crate::prelude::*;
 use bevy::prelude::*;
 
@@ -6,45 +6,24 @@ use std::vec;
 use std::ops::Add;
 
 
-pub fn spawn(commands: &mut Commands, object_id: ObjectId, position: Position, team: UnitTeam) {
-    commands.spawn((
-        UnitType::Pawn,
-        object_id.clone(),
-        position,
-        team.clone(),
-        UnitHealth(1),
-        UnitActions(vec![Box::new(PawnMoveAction)]),
-        SpriteConfig { src: get_sprite_src(team) }
-    ));
-}
-
-fn get_sprite_src(team: UnitTeam) -> String {
-    return if team.eq("White".into()) {
-        "whitePawn.png".into()
-    } else {
-        "blackPawn.png".into()
-    }
-}
-
 
 
 pub struct PawnMoveAction;
 
-impl UnitAction for PawnMoveAction {
+impl Action for PawnMoveAction {
     fn list_targets(
         &self,
         entity: &Entity,
         store: &Res<UnitStore>,
-        query: &Query<(&ObjectId, &Position, &UnitType, &UnitTeam, &UnitHealth, &UnitActions)>
+        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
     ) -> Box<dyn Iterator<Item = Position>> {
 
         let position = query.get_component::<Position>(*entity).unwrap();
-        let team = query.get_component::<UnitTeam>(*entity).unwrap();
+        let team = query.get_component::<Team>(*entity).unwrap();
 
-        let results = if team.eq("White".into()) {
-            list_pawn_move_targets(store, position, 1, 1)
-        } else {
-            list_pawn_move_targets(store, position, -1, 6)
+        let results = match team {
+            Team::White => list_pawn_move_targets(store, position, 1, 1),
+            Team::Black => list_pawn_move_targets(store, position, -1, 6),
         };
 
         Box::new(results.into_iter())
@@ -55,14 +34,13 @@ impl UnitAction for PawnMoveAction {
         entity: &Entity,
         &target: &Position,
         _store: &Res<UnitStore>,
-        query: &Query<(&ObjectId, &Position, &UnitType, &UnitTeam, &UnitHealth, &UnitActions)>
-    ) -> Box<dyn Iterator<Item=(ObjectId, UnitCmd)>> {
+        _query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
+    ) -> Box<dyn Iterator<Item=(Entity, UnitCmd)>> {
 
-        let &object_id = query.get_component::<ObjectId>(*entity).unwrap();
         // let &position = query.get_component::<Position>(*entity).unwrap();
 
-        let commands: Vec<(ObjectId, UnitCmd)> = vec![
-            (object_id, UnitCmd::SetPosition(target))
+        let commands: Vec<(Entity, UnitCmd)> = vec![
+            (*entity, UnitCmd::SetPosition(target))
         ];
 
         Box::new(commands.into_iter())

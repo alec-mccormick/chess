@@ -1,21 +1,19 @@
-mod tile;
+pub mod tile;
 
 
 use bevy::prelude::*;
 use crate::prelude::*;
 
-use super::map;
 
-
-
-#[derive(Debug, Clone, Default)]
 pub struct UIPlugin;
+
 
 impl Plugin for UIPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
             .add_system(sprite_interaction_system.system())
-            .add_plugin(tile::TileUIPlugin)
+            .add_system(tile::append_interaction_to_tile.system())
+            .add_system(tile::tile_interface_system.system())
         ;
     }
 }
