@@ -1,6 +1,4 @@
 mod position;
-mod event;
-pub mod entity;
 pub mod sprite;
 
 
