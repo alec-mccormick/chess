@@ -6,7 +6,7 @@ pub use store::*;
 
 use bevy::prelude::*;
 use crate::prelude::*;
-
+use std::ops::Deref;
 
 
 pub struct UnitPlugin;
@@ -19,6 +19,7 @@ impl Plugin for UnitPlugin {
             .add_event::<ExecuteActionEvent>()
             .add_system(handle_unit_cmd_system.system())
             .add_system(handle_execute_action.system())
+            .add_system(handle_health_change.system())
         ;
     }
 }
@@ -64,8 +65,31 @@ fn handle_execute_action(
         let actions = action_query.get_component::<Actions>(*entity).unwrap();
         let action = actions.get(*index).unwrap();
 
+        let is_valid_position = action
+            .list_targets(&entity, &store, &action_query)
+            .any(|p| p == *pos);
+
+        if !is_valid_position {
+            println!("Invalid position {:?}", pos);
+            return;
+        }
+
         for (e, cmd) in action.execute(&entity, &pos, &store, &action_query) {
             cmd_events.send((e, cmd));
+        }
+    }
+}
+
+fn handle_health_change(
+    mut commands: Commands,
+    mut store: ResMut<UnitStore>,
+    query: Query<With<Unit, (Entity, Mutated<Health>)>>
+) {
+    for (entity, health) in query.iter() {
+        if health.0 == 0 {
+            println!("!!!Unit reduced to 0 health: {:?}", entity);
+            commands.despawn(entity);
+            store.remove(entity);
         }
     }
 }

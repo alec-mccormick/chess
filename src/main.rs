@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use chess::prelude::*;
 
-use chess::core::map::MapPlugin;
-use chess::core::unit::{UnitPlugin, UnitComponents, Unit, Team, Health, Actions};
+use chess::core::unit::{UnitComponents, Unit, Team, Health, Actions};
+use chess::core::CorePlugin;
 
 use chess::render::RenderPlugin;
 use chess::ui::UIPlugin;
@@ -21,8 +21,7 @@ fn main() {
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugin(UnitPlugin)
-        .add_plugin(MapPlugin)
+        .add_plugin(CorePlugin)
         .add_plugin(RenderPlugin)
         .add_plugin(UIPlugin)
         .add_startup_system(setup.system())
@@ -37,7 +36,15 @@ fn setup(mut commands: Commands) {
         unit: Unit::Pawn,
         team: Team::White,
         health: Health(1),
-        position: Position::new(0, 0),
+        position: Position::new(0, 1),
+        actions: Actions(vec![Box::new(PawnMoveAction)]),
+    });
+
+    commands.spawn(UnitComponents {
+        unit: Unit::Pawn,
+        team: Team::Black,
+        health: Health(1),
+        position: Position::new(1, 6),
         actions: Actions(vec![Box::new(PawnMoveAction)]),
     });
 }

@@ -42,13 +42,13 @@ impl FromResources for UnitMaterials {
     }
 }
 
-fn get_material_for_unit(materials: &Res<UnitMaterials>, unit: &Unit) -> Handle<ColorMaterial> {
-    match unit {
-        Unit::Pawn => materials.white_pawn.clone()
+fn get_material_for_unit(materials: &Res<UnitMaterials>, unit: &Unit, team: &Team) -> Handle<ColorMaterial> {
+    match (unit, team) {
+        (Unit::Pawn, Team::White) => materials.white_pawn.clone(),
+        (Unit::Pawn, Team::Black) => materials.black_pawn.clone(),
+        // _ => {}
     }
 }
-
-
 
 pub fn append_sprite_to_unit(
     mut commands: Commands,
@@ -58,7 +58,7 @@ pub fn append_sprite_to_unit(
     // println!("Append sprite!");
 
     for (entity, unit, position, team) in query.iter() {
-        let material = get_material_for_unit(&materials, unit);
+        let material = get_material_for_unit(&materials, unit, team);
 
         let transform = Transform {
             translation: convert_position_to_translation(position),
@@ -73,7 +73,6 @@ pub fn append_sprite_to_unit(
         });
     }
 }
-
 
 fn convert_position_to_translation(position: &Position) -> Vec3 {
     let x = ((position.x as f32) - 4.0) * 100.0 + 50.0;

@@ -42,26 +42,26 @@ pub fn tile_interface_system(
 
         match *interaction {
             Interaction::Clicked => {
-                println!("Pressed! {:?}", position);
+                // println!("Pressed! {:?}", position);
 
                 match store.state {
                     InterfaceState::Default => {
                         if let Some(entity) = unit_store.get_unit(position) {
-                            println!("Unit selected!");
+                            // println!("Unit selected!");
                             store.state = InterfaceState::UnitSelected(*entity);
                         }
                     },
                     InterfaceState::UnitSelected(entity) => {
-                        println!("execute action!");
+                        // println!("execute action!");
                         cmds.send((entity, UnitCmd::ExecuteAction(0, *position)));
                     }
                 }
             }
             Interaction::Hovered => {
-                println!("Hover {:?}", position);
+                // println!("Hover {:?}", position);
             }
             Interaction::None => {
-                println!("None {:?}", position);
+                // println!("None {:?}", position);
             }
         }
     }

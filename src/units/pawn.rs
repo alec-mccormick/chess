@@ -21,10 +21,48 @@ impl Action for PawnMoveAction {
         let position = query.get_component::<Position>(*entity).unwrap();
         let team = query.get_component::<Team>(*entity).unwrap();
 
-        let results = match team {
-            Team::White => list_pawn_move_targets(store, position, 1, 1),
-            Team::Black => list_pawn_move_targets(store, position, -1, 6),
+        let (step, home_row) = match team {
+            Team::White => (1, 1),
+            Team::Black => (-1, 6)
         };
+
+        let mut results: Vec<Position> = vec![];
+
+        let mut next = position.add(Position::new(0, step));
+
+        if store.is_position_empty(&next) {
+            results.push(next.clone());
+
+            if position.y == home_row {
+                next = next.add(Position::new(0, step));
+
+                if store.is_position_empty(&next) {
+                    results.push(next.clone());
+                }
+            }
+        }
+
+        if position.x > 0 {
+            let attack_left_position = position.add(Position::new(-1, step));
+
+            if let Some(unit) = store.get_unit(&attack_left_position) {
+                let target_team = query.get_component::<Team>(*unit).unwrap();
+                if target_team != team {
+                    results.push(attack_left_position);
+                }
+            }
+        }
+
+        if position.x < 7 {
+            let attack_right_position = position.add(Position::new(1, step));
+
+            if let Some(unit) = store.get_unit(&attack_right_position) {
+                let target_team = query.get_component::<Team>(*unit).unwrap();
+                if target_team != team {
+                    results.push(attack_right_position);
+                }
+            }
+        }
 
         Box::new(results.into_iter())
     }
@@ -32,37 +70,24 @@ impl Action for PawnMoveAction {
     fn execute(
         &self,
         entity: &Entity,
-        &target: &Position,
-        _store: &Res<UnitStore>,
-        _query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
+        target: &Position,
+        store: &Res<UnitStore>,
+        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
     ) -> Box<dyn Iterator<Item=(Entity, UnitCmd)>> {
 
-        // let &position = query.get_component::<Position>(*entity).unwrap();
-
-        let commands: Vec<(Entity, UnitCmd)> = vec![
-            (*entity, UnitCmd::SetPosition(target))
+        let mut commands: Vec<(Entity, UnitCmd)> = vec![
+            (*entity, UnitCmd::SetPosition(*target))
         ];
+
+        if let Some(target_unit) = store.get_unit(target) {
+            let team = query.get_component::<Team>(*entity).unwrap();
+            let target_team = query.get_component::<Team>(*target_unit).unwrap();
+
+            if target_team != team {
+                commands.push((*target_unit, UnitCmd::SetHealth(Health(0))));
+            }
+        }
 
         Box::new(commands.into_iter())
     }
-}
-
-fn list_pawn_move_targets(store: &Res<UnitStore>, position: &Position, step: i32, home_row: i32) -> Vec<Position> {
-    let mut results: Vec<Position> = vec![];
-
-    let mut next = position.add(Position::new(0, step));
-
-    if store.is_position_empty(&next) {
-        results.push(next.clone());
-
-        if position.y == home_row {
-            next = next.add(Position::new(0, step));
-
-            if store.is_position_empty(&next) {
-                results.push(next.clone());
-            }
-        }
-    }
-
-    results
 }

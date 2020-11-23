@@ -23,22 +23,20 @@ impl UnitStore {
         self.position_to_unit_id.insert(position, unit_id);
     }
 
-    pub fn remove_position(&mut self, unit_id: Entity) {
+    pub fn remove(&mut self, unit_id: Entity) {
         self.remove_position_inner(unit_id);
         self.unit_id_to_position.remove(&unit_id);
     }
 
-    fn remove_position_inner(&mut self, unit_id: Entity) {
-        if let Some(current_position) = self.unit_id_to_position.get(&unit_id) {
-            match self.position_to_unit_id.get(&current_position) {
-                None => {}
-                Some(existing_unit_id) => {
-                    if unit_id.eq(existing_unit_id) {
-                        self.position_to_unit_id.remove(&current_position);
-                    }
-                }
-            }
+    fn remove_position_inner(&mut self, unit_id: Entity) -> Option<()> {
+        let current_position = self.unit_id_to_position.get(&unit_id)?;
+        let existing_unit_id = self.position_to_unit_id.get(&current_position)?;
+
+        if unit_id.eq(existing_unit_id) {
+            self.position_to_unit_id.remove(&current_position);
         }
+
+        Some(())
     }
 
     pub fn is_position_empty(&self, position: &Position) -> bool {
@@ -46,8 +44,8 @@ impl UnitStore {
     }
 
     pub fn get_unit(&self, position: &Position) -> Option<&Entity> {
-        println!("get_unit() {:?}", position);
-        println!("{:?}", self.position_to_unit_id);
+        // println!("get_unit() {:?}", position);
+        // println!("{:?}", self.position_to_unit_id);
 
         self.position_to_unit_id.get(position)
     }

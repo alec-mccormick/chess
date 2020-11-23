@@ -24,12 +24,12 @@ pub struct MapPlugin;
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
-            .add_startup_system(setup.system())
+            .add_startup_system(setup_map.system())
         ;
     }
 }
 
-fn setup(mut commands: Commands) {
+pub fn setup_map(mut commands: Commands) {
     for x in 0..8 {
         for y in 0..8 {
 
