@@ -1,4 +1,5 @@
 pub mod tile;
+pub mod info_panel;
 
 
 use bevy::prelude::*;
@@ -11,13 +12,48 @@ pub struct UIPlugin;
 impl Plugin for UIPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
+            .add_plugin(info_panel::InfoPanelPlugin)
             .add_system(sprite_interaction_system.system())
             .add_system(tile::append_interaction_to_tile.system())
             .add_system(tile::tile_interface_system.system())
+            .add_startup_system(setup.system())
         ;
     }
 }
 
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>
+) {
+
+    // println!("Spawn text!");
+
+    commands
+        .spawn(UiCameraComponents::default())
+        // .spawn(TextComponents {
+        //     style: Style {
+        //         align_self: AlignSelf::FlexEnd,
+        //         // margin: Rect {
+        //         //     right: Val::Px(0.0),
+        //         //     bottom: Val::Px(0.0),
+        //         //     left: Val::Auto,
+        //         //     top: Val::Auto
+        //         // },
+        //         ..Default::default()
+        //     },
+        //     text: Text {
+        //         value: "Active Player:".to_string(),
+        //         font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+        //         style: TextStyle {
+        //             font_size: 40.0,
+        //             color: Color::rgb(0.9, 0.9, 0.9),
+        //             ..Default::default()
+        //         },
+        //     },
+        //     ..Default::default()
+        // })
+    ;
+}
 
 
 #[derive(Default)]
