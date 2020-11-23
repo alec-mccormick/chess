@@ -1,9 +1,23 @@
-use crate::core::unit::{Action, UnitCmd, UnitStore, Unit, Team, Health, Actions};
+use crate::core::unit::{Action, UnitCmd, UnitStore, Unit, Team, Health, Actions, ActionResult, UnitComponents};
 use crate::prelude::*;
 use bevy::prelude::*;
 
 use std::vec;
 use std::ops::Add;
+
+use super::utils::move_unit;
+
+
+
+pub fn pawn() -> UnitComponents {
+    UnitComponents {
+        unit: Unit::Pawn,
+        team: Team::White,
+        health: Health(1),
+        position: Position::new(0, 0),
+        actions: Actions(vec![Box::new(PawnMoveAction)]),
+    }
+}
 
 
 
@@ -73,21 +87,7 @@ impl Action for PawnMoveAction {
         target: &Position,
         store: &Res<UnitStore>,
         query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
-    ) -> Box<dyn Iterator<Item=(Entity, UnitCmd)>> {
-
-        let mut commands: Vec<(Entity, UnitCmd)> = vec![
-            (*entity, UnitCmd::SetPosition(*target))
-        ];
-
-        if let Some(target_unit) = store.get_unit(target) {
-            let team = query.get_component::<Team>(*entity).unwrap();
-            let target_team = query.get_component::<Team>(*target_unit).unwrap();
-
-            if target_team != team {
-                commands.push((*target_unit, UnitCmd::SetHealth(Health(0))));
-            }
-        }
-
-        Box::new(commands.into_iter())
+    ) -> Box<dyn Iterator<Item = ActionResult>> {
+        Box::new(move_unit(entity, target, store, query))
     }
 }

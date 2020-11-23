@@ -44,37 +44,35 @@ impl UnitStore {
     }
 
     pub fn get_unit(&self, position: &Position) -> Option<&Entity> {
-        // println!("get_unit() {:?}", position);
-        // println!("{:?}", self.position_to_unit_id);
-
         self.position_to_unit_id.get(position)
     }
 }
 
 
 
+impl UnitStore {
 
-#[derive(Debug, Default)]
-pub struct UnitStorePlugin;
-
-impl Plugin for UnitStorePlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app
-            .add_resource(UnitStore::default())
-            .add_system(UnitStorePlugin::handle_position_changed.system())
-        ;
-    }
-}
-
-
-impl UnitStorePlugin {
-
-    fn handle_position_changed(
+    pub fn handle_position_changed(
         mut store: ResMut<UnitStore>,
         query: Query<With<Unit, (Entity, Changed<Position>)>>
     ) {
         for (entity, position) in query.iter() {
+            println!("UnitStore::handle_position_changed() {:?} {:?}", entity, *position);
             store.set_position(entity, *position);
+        }
+    }
+
+    pub fn handle_health_change(
+        mut commands: Commands,
+        mut store: ResMut<UnitStore>,
+        query: Query<With<Unit, (Entity, Mutated<Health>)>>
+    ) {
+        for (entity, health) in query.iter() {
+            if health.0 == 0 {
+                println!("!!!Unit reduced to 0 health: {:?}", entity);
+                commands.despawn(entity);
+                store.remove(entity);
+            }
         }
     }
 }

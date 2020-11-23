@@ -49,12 +49,12 @@ impl Default for GameState {
 
 
 fn handle_unit_cmd(
-    mut reader: Local<EventReader<(Entity, UnitCmd)>>,
-    events: Res<Events<(Entity, UnitCmd)>>,
+    mut reader: Local<EventReader<UnitCmd>>,
+    events: Res<Events<UnitCmd>>,
     mut state: ResMut<GameState>,
 ) {
-    for (_entity, cmd) in reader.iter(&events) {
-        if let UnitCmd::ExecuteAction(index, pos) = cmd {
+    for cmd in reader.iter(&events) {
+        if let UnitCmd::ExecuteAction(_entity, _index, _pos) = cmd {
             state.active_team = match state.active_team {
                 Team::White => Team::Black,
                 Team::Black => Team::White

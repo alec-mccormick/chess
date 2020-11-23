@@ -46,6 +46,12 @@ fn get_material_for_unit(materials: &Res<UnitMaterials>, unit: &Unit, team: &Tea
     match (unit, team) {
         (Unit::Pawn, Team::White) => materials.white_pawn.clone(),
         (Unit::Pawn, Team::Black) => materials.black_pawn.clone(),
+        (Unit::Bishop, Team::White) => materials.white_bishop.clone(),
+        (Unit::Bishop, Team::Black) => materials.black_bishop.clone(),
+        (Unit::Rook, Team::White) => materials.white_rook.clone(),
+        (Unit::Rook, Team::Black) => materials.black_rook.clone(),
+        (Unit::Queen, Team::White) => materials.white_queen.clone(),
+        (Unit::Queen, Team::Black) => materials.black_queen.clone(),
         // _ => {}
     }
 }

@@ -23,11 +23,22 @@ pub struct UnitComponents {
 #[derive(Debug, Copy, Clone)]
 pub enum Unit {
     Pawn,
-    // Bishop,
+    Bishop,
     // Knight,
-    // Rook,
+    Rook,
     // King,
-    // Queen
+    Queen
+}
+
+impl ToString for Unit {
+    fn to_string(&self) -> String {
+        match self {
+            Unit::Pawn => "Pawn".into(),
+            Unit::Bishop => "Bishop".into(),
+            Unit::Rook => "Rook".into(),
+            Unit::Queen => "Queen".into(),
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -36,8 +47,22 @@ pub enum Team {
     Black
 }
 
+impl ToString for Team {
+    fn to_string(&self) -> String {
+        match self {
+            Team::White => "White".into(),
+            Team::Black => "Black".into()
+        }
+    }
+}
+
+
 #[derive(Debug, Copy, Clone, From, Into, Deref)]
 pub struct Health(pub u32);
+
+
+
+
 
 
 
@@ -66,7 +91,26 @@ pub trait Action {
         target: &Position,
         store: &Res<UnitStore>,
         query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
-    ) -> Box<dyn Iterator<Item = (Entity, UnitCmd)>>;
+    ) -> Box<dyn Iterator<Item = ActionResult>>;
+}
+
+
+pub fn is_action_valid(
+    action: &Box<dyn Action + Send + Sync>,
+    entity: &Entity,
+    target: &Position,
+    store: &Res<UnitStore>,
+    query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
+) -> bool {
+    action
+        .list_targets(entity, store, query)
+        .any(|p| p == *target)
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum ActionResult {
+    SetPosition(Entity, Position),
+    SetHealth(Entity, Health)
 }
 
 
@@ -74,9 +118,7 @@ pub trait Action {
 ///
 #[derive(Debug, Copy, Clone)]
 pub enum UnitCmd {
-    SetPosition(Position),
-    SetHealth(Health),
-    ExecuteAction(usize, Position)
+    ExecuteAction(Entity, usize, Position)
 }
 
 
