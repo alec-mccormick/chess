@@ -9,6 +9,25 @@ use chess::ui::UIPlugin;
 
 use chess::units::*;
 
+/// Todo:
+/// x GameState, swap turns with each move (needs to be fixed to not work on invalid moves)
+/// x Validate move before executing
+/// - Highlight moves
+/// x Show current player with text
+/// x Implement attacking
+///     x Handle health changes in various modules (despawn + remove sprite)
+/// - Implement Knight
+/// - Implement King
+/// - Maintain internal list of all units in UnitStore
+/// - Update Action to no longer rely on Query
+/// - Update rendering to isometric
+/// - Migrate to using SpriteConfig
+/// - Build Action UI
+///     - Add Icon
+///     - Add Description
+/// - Add events for action executed, etc.
+/// - Migrate to ObjectId
+
 
 fn main() {
 
@@ -50,5 +69,5 @@ fn setup(mut commands: Commands) {
     commands.spawn(UnitComponents { team: Team::Black, position: Position::new(5, 7), ..bishop() });
 
     commands.spawn(UnitComponents { team: Team::White, position: Position::new(3, 0), ..queen() });
-    commands.spawn(UnitComponents { team: Team::White, position: Position::new(3, 7), ..queen() });
+    commands.spawn(UnitComponents { team: Team::Black, position: Position::new(3, 7), ..queen() });
 }

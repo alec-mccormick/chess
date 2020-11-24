@@ -7,13 +7,6 @@ use crate::prelude::*;
 use unit::{UnitPlugin, Team, UnitCmd};
 use map::{MapPlugin};
 
-/// Todo:
-/// x GameState, swap turns with each move (needs to be fixed to not work on invalid moves)
-/// x Validate move before executing
-/// - Highlight moves
-/// - Show current player with text
-/// - Implement attacking
-///     - Handle health changes in various modules (despawn + remove sprite)
 
 
 
