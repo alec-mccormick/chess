@@ -24,9 +24,9 @@ pub struct UnitComponents {
 pub enum Unit {
     Pawn,
     Bishop,
-    // Knight,
+    Knight,
     Rook,
-    // King,
+    King,
     Queen
 }
 
@@ -37,6 +37,8 @@ impl ToString for Unit {
             Unit::Bishop => "Bishop".into(),
             Unit::Rook => "Rook".into(),
             Unit::Queen => "Queen".into(),
+            Unit::Knight => "Knight".into(),
+            Unit::King => "King".into()
         }
     }
 }

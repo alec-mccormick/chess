@@ -75,15 +75,15 @@ impl UIState {
                     match store.state {
                         UIState::Default => {
                             if let Some(entity) = unit_store.get_unit(position) {
-                                // println!("-- unit selected: {:?}", entity);
+                                println!("-- unit selected: {:?}", entity);
 
                                 let team = action_query.get_component::<Team>(entity.clone()).unwrap();
 
                                 if team.eq(&game_state.active_team) {
-                                    // println!("Unit for active team selected");
+                                    println!("Unit for active team selected");
                                     store.state = UIState::UnitSelected(*entity);
                                 } else {
-                                    // println!("Inactive unit selected");
+                                    println!("Inactive unit selected");
                                 }
                             }
                         },
@@ -92,6 +92,7 @@ impl UIState {
                             let action = actions.get(0).unwrap();
 
                             if is_action_valid(action, &entity, position, &unit_store, &action_query) {
+                                println!("Execute action {:?}", entity);
                                 cmds.send(UnitCmd::ExecuteAction(entity, 0, *position));
                             }
 

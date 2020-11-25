@@ -52,6 +52,10 @@ fn get_material_for_unit(materials: &Res<UnitMaterials>, unit: &Unit, team: &Tea
         (Unit::Rook, Team::Black) => materials.black_rook.clone(),
         (Unit::Queen, Team::White) => materials.white_queen.clone(),
         (Unit::Queen, Team::Black) => materials.black_queen.clone(),
+        (Unit::Knight, Team::White) => materials.white_knight.clone(),
+        (Unit::Knight, Team::Black) => materials.black_knight.clone(),
+        (Unit::King, Team::White) => materials.white_king.clone(),
+        (Unit::King, Team::Black) => materials.black_king.clone(),
         // _ => {}
     }
 }

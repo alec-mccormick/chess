@@ -58,7 +58,7 @@ fn main() {
 fn setup(mut commands: Commands) {
 
 
-    for x in 0..8 {
+    for x in 0..=7 {
         commands.spawn(UnitComponents { team: Team::White, position: Position::new(x, 1), ..pawn() });
         commands.spawn(UnitComponents { team: Team::Black, position: Position::new(x, 6), ..pawn() });
     }
@@ -66,17 +66,23 @@ fn setup(mut commands: Commands) {
     let team = Team::White;
 
     commands.spawn(UnitComponents { team, position: Position::new(0, 0), ..rook() });
+    commands.spawn(UnitComponents { team, position: Position::new(1, 0), ..knight() });
     commands.spawn(UnitComponents { team, position: Position::new(2, 0), ..bishop() });
     commands.spawn(UnitComponents { team, position: Position::new(3, 0), ..queen() });
+    commands.spawn(UnitComponents { team, position: Position::new(4, 0), ..king() });
     commands.spawn(UnitComponents { team, position: Position::new(5, 0), ..bishop() });
+    commands.spawn(UnitComponents { team, position: Position::new(6, 0), ..knight() });
     commands.spawn(UnitComponents { team, position: Position::new(7, 0), ..rook() });
 
 
     let team = Team::Black;
 
-    commands.spawn(UnitComponents { team, position: Position::new(0, 7), ..ro ok() });
+    commands.spawn(UnitComponents { team, position: Position::new(0, 7), ..rook() });
+    commands.spawn(UnitComponents { team, position: Position::new(1, 7), ..knight() });
     commands.spawn(UnitComponents { team, position: Position::new(2, 7), ..bishop() });
     commands.spawn(UnitComponents { team, position: Position::new(3, 7), ..queen() });
+    commands.spawn(UnitComponents { team, position: Position::new(4, 7), ..king() });
     commands.spawn(UnitComponents { team, position: Position::new(5, 7), ..bishop() });
+    commands.spawn(UnitComponents { team, position: Position::new(6, 7), ..knight() });
     commands.spawn(UnitComponents { team, position: Position::new(7, 7), ..rook() });
 }
