@@ -17,8 +17,8 @@ impl Plugin for UnitPlugin {
             .add_event::<UnitCmd>()
             .add_event::<ActionResult>()
             .add_resource(UnitStore::default())
-            .add_system(handle_unit_cmd_system.system())
             .add_system(handle_action_result.system())
+            .add_system(handle_unit_cmd_system.system())
             .add_system(UnitStore::handle_position_changed.system())
             .add_system(UnitStore::handle_health_change.system())
         ;

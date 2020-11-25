@@ -18,15 +18,20 @@ use chess::units::*;
 ///     x Handle health changes in various modules (despawn + remove sprite)
 /// - Implement Knight
 /// - Implement King
-/// - Maintain internal list of all units in UnitStore
-/// - Update Action to no longer rely on Query
+/// - Add robust logging
 /// - Update rendering to isometric
 /// - Migrate to using SpriteConfig
+/// - Add Bot UI
+/// - Add startup screen
+///     - Allow user to select team
 /// - Build Action UI
 ///     - Add Icon
 ///     - Add Description
+/// - Add State Machine
 /// - Add events for action executed, etc.
-/// - Migrate to ObjectId
+/// - Update Action to no longer rely on Query
+///     - Maintain internal list of all units in UnitStore?
+///     - Migrate to ObjectId
 
 
 fn main() {
@@ -58,16 +63,20 @@ fn setup(mut commands: Commands) {
         commands.spawn(UnitComponents { team: Team::Black, position: Position::new(x, 6), ..pawn() });
     }
 
-    commands.spawn(UnitComponents { team: Team::White, position: Position::new(0, 0), ..rook() });
-    commands.spawn(UnitComponents { team: Team::White, position: Position::new(7, 0), ..rook() });
-    commands.spawn(UnitComponents { team: Team::Black, position: Position::new(0, 7), ..rook() });
-    commands.spawn(UnitComponents { team: Team::Black, position: Position::new(7, 7), ..rook() });
+    let team = Team::White;
 
-    commands.spawn(UnitComponents { team: Team::White, position: Position::new(2, 0), ..bishop() });
-    commands.spawn(UnitComponents { team: Team::White, position: Position::new(5, 0), ..bishop() });
-    commands.spawn(UnitComponents { team: Team::Black, position: Position::new(2, 7), ..bishop() });
-    commands.spawn(UnitComponents { team: Team::Black, position: Position::new(5, 7), ..bishop() });
+    commands.spawn(UnitComponents { team, position: Position::new(0, 0), ..rook() });
+    commands.spawn(UnitComponents { team, position: Position::new(2, 0), ..bishop() });
+    commands.spawn(UnitComponents { team, position: Position::new(3, 0), ..queen() });
+    commands.spawn(UnitComponents { team, position: Position::new(5, 0), ..bishop() });
+    commands.spawn(UnitComponents { team, position: Position::new(7, 0), ..rook() });
 
-    commands.spawn(UnitComponents { team: Team::White, position: Position::new(3, 0), ..queen() });
-    commands.spawn(UnitComponents { team: Team::Black, position: Position::new(3, 7), ..queen() });
+
+    let team = Team::Black;
+
+    commands.spawn(UnitComponents { team, position: Position::new(0, 7), ..ro ok() });
+    commands.spawn(UnitComponents { team, position: Position::new(2, 7), ..bishop() });
+    commands.spawn(UnitComponents { team, position: Position::new(3, 7), ..queen() });
+    commands.spawn(UnitComponents { team, position: Position::new(5, 7), ..bishop() });
+    commands.spawn(UnitComponents { team, position: Position::new(7, 7), ..rook() });
 }
