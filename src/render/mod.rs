@@ -1,5 +1,6 @@
 pub mod unit;
 pub mod map;
+mod utils;
 
 use bevy::{prelude::*};
 use crate::prelude::*;
@@ -38,13 +39,7 @@ fn handle_position_update(
     for (position, mut transform) in query.iter_mut() {
         let translate = &transform.translation;
 
-        transform.translation = convert_position_to_translation(&*position)
+        transform.translation = utils::convert_position_to_vec2(&*position)
             .extend(translate.z());
     }
-}
-
-fn convert_position_to_translation(position: &Position) -> Vec2 {
-    let x = ((position.x as f32) - 4.0) * 100.0 + 50.0;
-    let y = ((position.y as f32) - 4.0) * 100.0 + 50.0;
-    Vec2::new(x, y)
 }

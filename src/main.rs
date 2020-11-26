@@ -16,10 +16,11 @@ use chess::units::*;
 /// x Show current player with text
 /// x Implement attacking
 ///     x Handle health changes in various modules (despawn + remove sprite)
-/// - Implement Knight
-/// - Implement King
+/// x Implement Knight
+/// x Implement King
 /// - Add robust logging
 /// - Update rendering to isometric
+/// - Add Networking
 /// - Migrate to using SpriteConfig
 /// - Add Bot UI
 /// - Add startup screen

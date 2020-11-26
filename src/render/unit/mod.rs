@@ -3,6 +3,7 @@ use crate::prelude::*;
 
 use crate::core::unit::{Unit, Team};
 
+use super::utils;
 
 
 pub struct UnitMaterials {
@@ -71,7 +72,7 @@ pub fn append_sprite_to_unit(
         let material = get_material_for_unit(&materials, unit, team);
 
         let transform = Transform {
-            translation: convert_position_to_translation(position),
+            translation: utils::convert_position_to_vec2(position).extend(20.0),
             rotation: Quat::identity(),
             scale: Vec3::splat(2.0)
         };
@@ -82,10 +83,4 @@ pub fn append_sprite_to_unit(
             ..Default::default()
         });
     }
-}
-
-fn convert_position_to_translation(position: &Position) -> Vec3 {
-    let x = ((position.x as f32) - 4.0) * 100.0 + 50.0;
-    let y = ((position.y as f32) - 4.0) * 100.0 + 50.0;
-    Vec3::new(x, y, 1.0)
 }

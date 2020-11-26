@@ -3,9 +3,20 @@ use crate::prelude::*;
 
 use crate::core::map::{Tile};
 
+use super::utils;
+
 pub struct TileMaterials {
     white: Handle<ColorMaterial>,
     black: Handle<ColorMaterial>,
+}
+
+impl TileMaterials {
+    fn get_material(&self, tile: &Tile) -> Handle<ColorMaterial> {
+        match tile {
+            Tile::White => self.white.clone(),
+            Tile::Black => self.black.clone()
+        }
+    }
 }
 
 impl FromResources for TileMaterials {
@@ -14,18 +25,12 @@ impl FromResources for TileMaterials {
         let mut materials = resources.get_mut::<Assets<ColorMaterial>>().unwrap();
 
         TileMaterials {
-            white: materials.add(asset_server.load("white.png").into()),
-            black: materials.add(asset_server.load("black.png").into()),
+            white: materials.add(asset_server.load("textures/ground_0.png").into()),
+            black: materials.add(asset_server.load("textures/ground_burnt.png").into()),
         }
     }
 }
 
-fn get_material_for_tile(materials: &Res<TileMaterials>, tile: &Tile) -> Handle<ColorMaterial> {
-    match tile {
-        Tile::White => materials.white.clone(),
-        Tile::Black => materials.black.clone()
-    }
-}
 
 pub fn append_sprite_to_tile(
     mut commands: Commands,
@@ -33,14 +38,12 @@ pub fn append_sprite_to_tile(
     query: Query<Without<Sprite, (Entity, &Tile, &Position)>>
 ) {
     for (entity, tile, position) in query.iter() {
-        // println!("append sprite to tile! {:?} {:?}", entity, position);
-
-        let material = get_material_for_tile(&materials, tile);
+        let material = materials.get_material(tile);
 
         let transform = Transform {
             translation: convert_position_to_translation(position),
             rotation: Quat::identity(),
-            scale: Vec3::splat(0.5)
+            scale: Vec3::splat(2.0)
         };
 
         commands.insert(entity, SpriteComponents {
@@ -51,9 +54,7 @@ pub fn append_sprite_to_tile(
     }
 }
 
-
 fn convert_position_to_translation(position: &Position) -> Vec3 {
-    let x = ((position.x as f32) - 4.0) * 100.0 + 50.0;
-    let y = ((position.y as f32) - 4.0) * 100.0 + 50.0;
-    Vec3::new(x, y, 0.0)
+    let z = (10 + position.x - position.y) as f32;
+    utils::convert_position_to_vec2(position).extend(z)
 }
