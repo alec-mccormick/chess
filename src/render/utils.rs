@@ -15,3 +15,8 @@ pub fn convert_position_to_vec2(pos: &Position) -> Vec2 {
     let y = ((pos.y - pos.x) * HALF_TILE_RENDER_HEIGHT_PX) as f32;
     Vec2::new(x, y)
 }
+
+pub fn convert_dimensions_to_map_offset(dimensions: &Dimensions) -> Vec3 {
+    let x = ((dimensions.width + dimensions.height - 2) * HALF_TILE_RENDER_WIDTH_PX) as f32;
+    Vec3::new(-x / 2.0, 0.0, 0.0)
+}

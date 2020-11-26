@@ -2,32 +2,52 @@ use bevy::prelude::*;
 use log::{debug};
 use crate::prelude::*;
 
-use crate::core::map::{Map};
 use std::cmp::max;
+use crate::core::map::{Map};
 
-use super::super::utils::{HALF_TILE_RENDER_WIDTH_PX};
+use super::super::utils;
+use bevy::ecs::Command;
 
 
-pub fn render_map(
-    mut commands: Commands,
-    query: Query<(Entity, &Dimensions, Added<Map>)>,
-) {
-    for (entity, dimensions, map) in query.iter() {
-        debug!("Map added: {:?}, {:?}", *map, dimensions);
+/// Element to contain map and control map scale.
+#[derive(Clone, Copy)]
+pub struct MapContainer;
 
-        commands.insert(entity, MeshComponents {
-            transform: Transform {
-                translation: convert_dimensions_to_translation(dimensions),
-                scale: Vec3::splat(2.0),
-                ..Default::default()
-            },
-            ..Default::default()
-        });
+/// Command to make a draw a map & position it in the screen.
+#[derive(Clone, Copy)]
+pub struct RenderMapCmd {
+    pub entity: Entity,
+}
+
+impl Command for RenderMapCmd {
+    fn write(self: Box<Self>, world: &mut World, _: &mut Resources) {
+        let map_container_entity = self.spawn_container(world);
+        self.insert_map_mesh(world, map_container_entity);
     }
 }
 
+impl RenderMapCmd {
+    fn spawn_container(&self, world: &mut World) -> Entity {
+        let map_container_entity = world.spawn(MeshComponents {
+            transform: Transform::from_scale(Vec3::splat(2.0)),
+            ..Default::default()
+        });
 
-fn convert_dimensions_to_translation(dimensions: &Dimensions) -> Vec3 {
-    let x = ((dimensions.width + dimensions.height - 2) * HALF_TILE_RENDER_WIDTH_PX) as f32;
-    Vec3::new(-x, 0.0, 0.0)
+        world.insert_one(map_container_entity, MapContainer).unwrap();
+        map_container_entity
+    }
+
+    fn insert_map_mesh(&self, world: &mut World, parent: Entity) {
+        let dimensions = world.get::<Dimensions>(self.entity).unwrap();
+
+        world.insert(self.entity, MeshComponents {
+            transform: Transform {
+                translation: utils::convert_dimensions_to_map_offset(dimensions),
+                ..Default::default()
+            },
+            ..Default::default()
+        }).unwrap();
+
+        world.insert_one(self.entity, Parent(parent)).unwrap();
+    }
 }
