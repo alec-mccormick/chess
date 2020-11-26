@@ -8,6 +8,8 @@ use bevy::prelude::*;
 use crate::prelude::*;
 use std::ops::Deref;
 
+use log::{debug};
+
 
 pub struct UnitPlugin;
 
@@ -20,7 +22,7 @@ impl Plugin for UnitPlugin {
             .add_system(handle_action_result.system())
             .add_system(handle_unit_cmd_system.system())
             .add_system(UnitStore::handle_position_changed.system())
-            .add_system(UnitStore::handle_health_change.system())
+            .add_system(UnitStore::handle_health_changed.system())
         ;
     }
 }
@@ -33,16 +35,15 @@ fn handle_unit_cmd_system(
     action_query: Query<(&Unit, &Position, &Team, &Health, &Actions)>,
 ) {
     for cmd in reader.iter(&events) {
-        println!("handle_unit_cmd() {:?}", cmd);
+        debug!("handle_unit_cmd() {:?}", cmd);
 
         match cmd {
             UnitCmd::ExecuteAction(entity, index, pos) => {
                 let actions = action_query.get_component::<Actions>(*entity).unwrap();
                 let action = actions.get(*index).unwrap();
 
-
                 if !is_action_valid(action, &entity, &pos, &store, &action_query) {
-                    println!("Invalid position {:?}", pos);
+                    debug!("handle_unit_cmd() - target position is invalid: {:?}", pos);
                     return;
                 }
 
@@ -60,7 +61,7 @@ fn handle_action_result(
     mut query: Query<With<Unit, (&mut Position, &mut Health)>>,
 ) {
     for result in reader.iter(&events) {
-        println!("handle_action_result() {:?}", result);
+        debug!("handle_action_result() {:?}", result);
 
         match result {
             ActionResult::SetPosition(entity, position) => {

@@ -11,3 +11,6 @@ bevy = "0.3"
 rand = "0.7"
 
 derive_more = "0.99.11"
+
+log = "0.4"
+env_logger = "0.8"

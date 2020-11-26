@@ -36,6 +36,7 @@ use chess::units::*;
 
 
 fn main() {
+    env_logger::init();
 
     App::build()
         .add_resource(WindowDescriptor {

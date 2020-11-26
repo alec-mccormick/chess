@@ -1,3 +1,5 @@
+use log::{debug};
+
 use std::collections::{HashMap};
 use bevy::prelude::*;
 
@@ -57,19 +59,21 @@ impl UnitStore {
         query: Query<With<Unit, (Entity, Changed<Position>)>>
     ) {
         for (entity, position) in query.iter() {
-            println!("UnitStore::handle_position_changed() {:?} {:?}", entity, *position);
+            debug!("handle_position_changed() {:?} {:?}", entity, *position);
             store.set_position(entity, *position);
         }
     }
 
-    pub fn handle_health_change(
+    pub fn handle_health_changed(
         mut commands: Commands,
         mut store: ResMut<UnitStore>,
         query: Query<With<Unit, (Entity, Mutated<Health>)>>
     ) {
         for (entity, health) in query.iter() {
+            debug!("handle_health_changed() {:?} {:?}", entity, *health);
+
             if health.0 == 0 {
-                println!("!!!Unit reduced to 0 health: {:?}", entity);
+                debug!("!!!Unit reduced to 0 health: {:?}", entity);
                 commands.despawn(entity);
                 store.remove(entity);
             }
