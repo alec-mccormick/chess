@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use crate::prelude::*;
 
 
-pub const TILE_RENDER_WIDTH_PX: i32 = 112;
-pub const TILE_RENDER_HEIGHT_PX: i32 = 84;
+pub const TILE_RENDER_WIDTH_PX: i32 = 56;
+pub const TILE_RENDER_HEIGHT_PX: i32 = 42;
 
 pub const HALF_TILE_RENDER_WIDTH_PX: i32 = TILE_RENDER_WIDTH_PX / 2;
 pub const HALF_TILE_RENDER_HEIGHT_PX: i32 = TILE_RENDER_HEIGHT_PX / 2;

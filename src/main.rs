@@ -1,8 +1,13 @@
 use bevy::prelude::*;
+use bevy_prototype_lyon::prelude::*;
+
 use chess::prelude::*;
 
-use chess::core::unit::{UnitComponents, Unit, Team, Health, Actions};
-use chess::core::CorePlugin;
+use chess::core::{
+    CorePlugin,
+    map::{TileComponents, Tile, MapComponents, Map},
+    unit::{UnitComponents, Unit, Team, Health, Actions},
+};
 
 use chess::render::RenderPlugin;
 use chess::ui::UIPlugin;
@@ -51,14 +56,45 @@ fn main() {
         .add_plugin(CorePlugin)
         .add_plugin(RenderPlugin)
         .add_plugin(UIPlugin)
-        .add_startup_system(setup.system())
+        .add_startup_system(setup_map.system())
+        .add_startup_system(setup_units.system())
         .run()
     ;
 }
 
+fn setup_map(
+    mut commands: Commands,
+    // mut materials: ResMut<Assets<ColorMaterial>>,
+    // mut meshes: ResMut<Assets<Mesh>>,
+) {
+    let map = commands
+        .spawn(MapComponents::default())
+        .current_entity()
+        .unwrap();
 
-fn setup(mut commands: Commands) {
+    for x in 0..=7 {
+        for y in 0..=7 {
+            let position = Position::new(x, y);
+            let tile = if (x + y) % 2 == 0 { Tile::Black } else { Tile::White };
 
+            commands
+                .spawn(TileComponents { tile, position: position.clone() })
+                .with(Parent(map.clone()));
+        }
+    }
+
+    // let material = materials.add(Color::rgb(0.8, 0.0, 0.0).into());
+    //
+    // commands.spawn(primitive(
+    //     material.clone(),
+    //     &mut meshes,
+    //     ShapeType::Circle(20.0),
+    //     TessellationMode::Fill(&FillOptions::default()),
+    //     Vec3::new(0.0, 0.0, 50.0),
+    // ));
+}
+
+fn setup_units(mut commands: Commands) {
 
     for x in 0..=7 {
         commands.spawn(UnitComponents { team: Team::White, position: Position::new(x, 1), ..pawn() });

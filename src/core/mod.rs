@@ -10,15 +10,15 @@ use map::{MapPlugin};
 
 
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CorePlugin;
 
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
             .add_resource(GameState::default())
-            .add_plugin(UnitPlugin)
             .add_plugin(MapPlugin)
+            .add_plugin(UnitPlugin)
             .add_system(handle_unit_cmd.system())
         ;
     }
@@ -39,7 +39,6 @@ impl Default for GameState {
         }
     }
 }
-
 
 fn handle_unit_cmd(
     mut reader: Local<EventReader<UnitCmd>>,
