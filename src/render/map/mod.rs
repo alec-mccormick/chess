@@ -1,12 +1,14 @@
 use bevy::{prelude::*, ecs::Command};
 use std::{ops::Deref, cmp::max};
 use log::{debug};
+use lyon::{math::Point};
 
 use bevy_prototype_lyon::prelude::*;
 
 use crate::prelude::*;
 use crate::core::map::{Map, Tile};
 use super::utils;
+use crate::render::utils::{HALF_TILE_RENDER_WIDTH_PX, HALF_TILE_RENDER_HEIGHT_PX};
 
 
 /// ==========================================================================
@@ -101,7 +103,13 @@ fn handle_tile_spawned(
             .spawn(primitive(
                 materials.invisible.clone(),
                 &mut meshes,
-                ShapeType::Circle(8.0),
+                // ShapeType::Circle(8.0),
+                ShapeType::Quad(
+                    Point::new(-HALF_TILE_RENDER_WIDTH_PX as f32, 0.0),
+                    Point::new(0.0, HALF_TILE_RENDER_HEIGHT_PX as f32),
+                    Point::new(HALF_TILE_RENDER_WIDTH_PX as f32, 0.0),
+                    Point::new(0.0, -HALF_TILE_RENDER_HEIGHT_PX as f32)
+                ),
                 TessellationMode::Fill(&FillOptions::default()),
                 Vec3::new(0.0, 0.0, 10.0),
             ))
@@ -214,7 +222,7 @@ impl FromResources for TileMaterials {
         TileMaterials {
             white: materials.add(asset_server.load("textures/ground_0.png").into()),
             black: materials.add(asset_server.load("textures/ground_burnt.png").into()),
-            hover_overlay: materials.add(Color::rgb(0.8, 0.0, 0.0).into()),
+            hover_overlay: materials.add(Color::rgba(0.0, 1.0, 0.0, 0.15).into()),
             invisible: materials.add(Color::rgba(0.0, 0.0, 0.0, 0.0).into())
         }
     }

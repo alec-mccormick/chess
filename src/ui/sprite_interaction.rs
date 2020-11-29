@@ -111,9 +111,7 @@ pub fn sprite_interaction_system(
     if let Some(new_hovered_entity) = hovered_entity {
         if let Some(old_hovered_entity) = state.hovered_entity {
             if new_hovered_entity != old_hovered_entity {
-                if let Ok(mut interaction) =
-                query.get_component_mut::<Interaction>(old_hovered_entity)
-                {
+                if let Ok(mut interaction) = query.get_component_mut::<Interaction>(old_hovered_entity) {
                     if *interaction == Interaction::Hovered {
                         *interaction = Interaction::None;
                     }
@@ -121,6 +119,7 @@ pub fn sprite_interaction_system(
                 state.hovered_entity = None;
             }
         }
+
         state.hovered_entity = hovered_entity;
     }
 }

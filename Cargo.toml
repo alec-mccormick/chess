@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 bevy = "0.3"
 bevy_prototype_lyon = "0.1.3"
+lyon = "0.16.2"
 
 rand = "0.7"
 
