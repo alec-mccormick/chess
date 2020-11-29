@@ -62,9 +62,7 @@ pub fn handle_input_state_change(
             }
         }
         InputState::Default => {
-
             if let Some(InputState::UnitSelected(entity)) = *previous_state {
-
                 let actions = action_query.get_component::<Actions>(entity.clone()).unwrap();
                 let action = actions.get(0).unwrap();
 
@@ -80,7 +78,6 @@ pub fn handle_input_state_change(
                     }
                 }
             }
-
         }
     };
 

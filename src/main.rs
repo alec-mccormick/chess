@@ -23,8 +23,8 @@ use chess::units::*;
 ///     x Handle health changes in various modules (despawn + remove sprite)
 /// x Implement Knight
 /// x Implement King
-/// - Add robust logging
-/// - Update rendering to isometric
+/// x Add robust logging
+/// x Update rendering to isometric
 /// - Add Networking
 /// - Migrate to using SpriteConfig
 /// - Add Bot UI
