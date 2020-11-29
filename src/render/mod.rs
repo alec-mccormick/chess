@@ -1,9 +1,11 @@
 pub mod unit;
 pub mod map;
-mod utils;
+pub(crate) mod utils;
 
 use bevy::{prelude::*};
 use crate::prelude::*;
+
+use log::{trace};
 
 
 
@@ -27,16 +29,26 @@ fn setup(mut commands: Commands) {
     commands
         .spawn(Camera2dComponents::default())
     ;
+    // let map_offset = (7 * utils::HALF_TILE_RENDER_HEIGHT_PX) as f32 * 2.5;
+    // let start = (window.width as f32 / 2.0) - map_offset - (2 * utils::HALF_TILE_RENDER_HEIGHT_PX as f32);
+    // println!("!!! Window width: {}, map_offset: {}, start: {}", window.width, map_offset, start);
 }
 
 
 fn handle_position_update(
-    mut query: Query<(Mutated<Position>, &mut Transform)>
+    mut query: Query<(Changed<Position>, &mut Transform, Option<&TransformOffset>)>
 ) {
-    for (position, mut transform) in query.iter_mut() {
-        let translate = &transform.translation;
+    for (position, mut transform, transform_offset) in query.iter_mut() {
+        trace!("handle_position_update() {:?}", *position);
 
-        transform.translation = utils::convert_position_to_vec2(&*position)
-            .extend(translate.z());
+        let z = (7 + position.x - position.y) as f32 / 14.0;
+
+        let translation = utils::convert_position_to_vec2(&*position)
+            .extend(z);
+
+        transform.translation = match transform_offset {
+            Some(offset) => translation + offset.0,
+            None => translation
+        };
     }
 }

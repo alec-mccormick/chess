@@ -1,6 +1,11 @@
 use bevy::prelude::*;
 use crate::prelude::*;
 
+use log::{trace};
+
+use crate::core::Tile;
+use crate::render::utils::{HALF_TILE_RENDER_WIDTH_PX, HALF_TILE_RENDER_HEIGHT_PX};
+
 
 #[derive(Default)]
 pub struct State {
@@ -16,41 +21,79 @@ pub fn sprite_interaction_system(
     cursor_moved_events: Res<Events<CursorMoved>>,
     touches_input: Res<Touches>,
     window: Res<WindowDescriptor>,
-    mut query: Query<(Entity, &Sprite, &GlobalTransform, &mut Interaction)>
+    mut query: Query<(Entity, &Tile, &GlobalTransform, &mut Interaction)>
 ) {
     let mut cursor_changed = false;
 
     if let Some(cursor_moved) = state.cursor_moved_event_reader.latest(&cursor_moved_events) {
         state.cursor_position = cursor_moved.position;
         cursor_changed = true;
+        // trace!("cursor position: {:?}", cursor_moved.position);
     }
     if let Some(touch) = touches_input.get_pressed(0) {
         state.cursor_position = touch.position;
         cursor_changed = true;
     }
 
-    let mouse_clicked = mouse_button_input.just_released(MouseButton::Left) || touches_input.just_released(0);
+    let mouse_clicked = mouse_button_input.just_released(MouseButton::Left)
+        || touches_input.just_released(0);
 
     if !cursor_changed && !mouse_clicked {
         return;
     }
 
+    let center = Vec2::new(window.width as f32 / 2.0, window.height as f32 / 2.0);
+    let cursor_position = state.cursor_position - center;
+
+    let tile_size = Vec2::new(HALF_TILE_RENDER_WIDTH_PX as f32, HALF_TILE_RENDER_HEIGHT_PX as f32);
+
+    let mut potential_tiles = query
+        .iter_mut()
+        .filter_map(|(entity, tile, global_transform, interaction)| {
+            let position = global_transform.translation.truncate();
+            let scaled_tile_size = tile_size * global_transform.scale.truncate();
+
+            let btm_left = position - scaled_tile_size;
+            let top_right = position + scaled_tile_size;
+
+            if cursor_position >= btm_left && cursor_position <= top_right {
+                return Some((entity, tile, position, interaction, btm_left, top_right));
+            }
+
+            None
+        })
+        .collect::<Vec<_>>();
+
+    potential_tiles.sort_by(|(_, _, _, _, _, a), (_, _, _, _, _, b)| {
+        a.y().partial_cmp(&b.y()).unwrap()
+    });
+
     let mut hovered_entity = None;
 
-    for (entity, sprite, global_transform, mut interaction) in query.iter_mut() {
-        let position = global_transform.translation.truncate();
-        let size = sprite.size * global_transform.scale.truncate();
+    for (entity, _tile, position, mut interaction, btm_left, top_right) in potential_tiles {
+        let is_valid = if cursor_position.x() < position.x() {
+            let a = Vec2::new(btm_left.x(), position.y());
 
-        let x = (window.width as f32 / 2.0) + position.x() - (size.x() / 2.0);
-        let y = (window.height as f32 / 2.0) + position.y() - (size.y() / 2.0);
+            if cursor_position.y() > position.y() {
+                let b = Vec2::new(position.x(), top_right.y());
+                !is_above_line(cursor_position, a, b)
+            } else {
+                let b = Vec2::new(position.x(), btm_left.y());
+                is_above_line(cursor_position, a, b)
+            }
+        } else {
+            let b = Vec2::new(top_right.x(), position.y());
 
-        let diff_x = state.cursor_position.x() - x;
-        let diff_y = state.cursor_position.y() - y;
+            if cursor_position.y() > position.y() {
+                let a = Vec2::new(position.x(), top_right.y());
+                !is_above_line(cursor_position, a, b)
+            } else {
+                let a = Vec2::new(position.x(), btm_left.y());
+                is_above_line(cursor_position, a, b)
+            }
+        };
 
-        let is_hovered = (diff_x >= 0.0 && diff_x < size.x())
-            && (diff_y >= 0.0 && diff_y < size.y());
-
-        if is_hovered {
+        if is_valid {
             if mouse_clicked {
                 if *interaction != Interaction::Clicked {
                     *interaction = Interaction::Clicked;
@@ -60,6 +103,8 @@ pub fn sprite_interaction_system(
             }
 
             hovered_entity = Some(entity);
+
+            break;
         }
     }
 
@@ -78,4 +123,11 @@ pub fn sprite_interaction_system(
         }
         state.hovered_entity = hovered_entity;
     }
+}
+
+
+fn is_above_line(point: Vec2, a: Vec2, b: Vec2) -> bool {
+    let slope = (b.y() - a.y()) / (b.x() - a.x());
+
+    return point.y() >= a.y() + slope * (point.x() - a.x());
 }

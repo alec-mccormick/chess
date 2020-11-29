@@ -2,6 +2,8 @@ use bevy::{prelude::*, ecs::Command};
 use std::{ops::Deref, cmp::max};
 use log::{debug};
 
+use bevy_prototype_lyon::prelude::*;
+
 use crate::prelude::*;
 use crate::core::map::{Map, Tile};
 use super::utils;
@@ -18,6 +20,7 @@ impl Plugin for RenderMapPlugin {
             .init_resource::<TileMaterials>()
             .add_system(handle_map_spawned.system())
             .add_system(handle_tile_spawned.system())
+            .add_system(handle_tile_overlay_changed.system())
         ;
     }
 }
@@ -55,7 +58,7 @@ impl Command for RenderMapCmd {
 impl RenderMapCmd {
     fn spawn_container(&self, world: &mut World) -> Entity {
         let entity = world.spawn(MeshComponents {
-            transform: Transform::from_scale(Vec3::splat(2.0)),
+            transform: Transform::from_scale(Vec3::splat(2.5)),
             ..Default::default()
         });
 
@@ -85,12 +88,35 @@ impl RenderMapCmd {
 fn handle_tile_spawned(
     mut commands: Commands,
     materials: Res<TileMaterials>,
+    mut meshes: ResMut<Assets<Mesh>>,
     query: Query<(Entity, &Position, Added<Tile>)>,
 ) {
     for (entity, _position, tile) in query.iter() {
         let material = materials.get_material(tile);
         commands.add_command(RenderTileCmd { entity, material });
+
+        commands.insert_one(entity, TileOverlayState::Invisible);
+
+        commands
+            .spawn(primitive(
+                materials.invisible.clone(),
+                &mut meshes,
+                ShapeType::Circle(8.0),
+                TessellationMode::Fill(&FillOptions::default()),
+                Vec3::new(0.0, 0.0, 10.0),
+            ))
+            .with(TileOverlay)
+            .with(Parent(entity));
     }
+}
+
+#[derive(Debug)]
+pub struct TileOverlay;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TileOverlayState {
+    Invisible,
+    Visible,
 }
 
 struct RenderTileCmd {
@@ -130,10 +156,32 @@ impl RenderTileCmd {
 
     fn generate_transform(position: &Position) -> Transform {
         // todo: update to use max dimension of map entity instead
-        let z = (8 + position.x - position.y) as f32 / 16.0;
+        let z = (7 + position.x - position.y) as f32 / 14.0;
         let translation = utils::convert_position_to_vec2(position).extend(z);
 
         Transform::from_translation(translation)
+    }
+}
+
+/// ==========================================================================
+/// Tile Overlay
+/// ==========================================================================
+fn handle_tile_overlay_changed(
+    tile_materials: Res<TileMaterials>,
+    tile_query: Query<With<Tile, (Changed<TileOverlayState>, &Children)>>,
+    mut overlay_query: Query<With<TileOverlay, &mut Handle<ColorMaterial>>>
+) {
+    for (tile_overlay_state, children) in tile_query.iter() {
+        debug!("handle_tile_overlay_changed() {:?}", *tile_overlay_state);
+
+        for child in children.iter() {
+            if let Ok(mut material) = overlay_query.get_mut(*child) {
+                *material = match tile_overlay_state.deref() {
+                    TileOverlayState::Invisible => tile_materials.invisible.clone(),
+                    TileOverlayState::Visible => tile_materials.hover_overlay.clone()
+                };
+            }
+        }
     }
 }
 
@@ -145,6 +193,8 @@ impl RenderTileCmd {
 pub struct TileMaterials {
     white: Handle<ColorMaterial>,
     black: Handle<ColorMaterial>,
+    pub hover_overlay: Handle<ColorMaterial>,
+    pub invisible: Handle<ColorMaterial>
 }
 
 impl TileMaterials {
@@ -164,6 +214,8 @@ impl FromResources for TileMaterials {
         TileMaterials {
             white: materials.add(asset_server.load("textures/ground_0.png").into()),
             black: materials.add(asset_server.load("textures/ground_burnt.png").into()),
+            hover_overlay: materials.add(Color::rgb(0.8, 0.0, 0.0).into()),
+            invisible: materials.add(Color::rgba(0.0, 0.0, 0.0, 0.0).into())
         }
     }
 }

@@ -13,10 +13,11 @@ pub use tile::*;
 pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
-    fn build(&self, _app: &mut AppBuilder) {
-        // app
-        //     .add_startup_system(setup_map.system())
-        // ;
+    fn build(&self, app: &mut AppBuilder) {
+        app
+            .add_resource(TileStore::default())
+            .add_system(TileStore::handle_position_changed.system())
+        ;
     }
 }
 

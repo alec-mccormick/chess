@@ -41,37 +41,31 @@ struct RenderUnitCmd {
 
 impl Command for RenderUnitCmd {
     fn write(self: Box<Self>, world: &mut World, _: &mut Resources) {
-        self.insert_mesh(world);
-        self.spawn_sprite(world);
+        self.insert_sprite(world);
     }
 }
 
 impl RenderUnitCmd {
-    fn insert_mesh(&self, world: &mut World) {
+    fn insert_sprite(&self, world: &mut World) {
         let position = world.get::<Position>(self.entity).unwrap();
 
-        world.insert(self.entity, MeshComponents {
+        world.insert(self.entity, SpriteComponents {
+            material: self.material.clone(),
             transform: Self::generate_transform(position),
             ..Default::default()
         }).unwrap();
-    }
-
-    fn spawn_sprite(&self, world: &mut World) {
-        let sprite_entity = world.spawn(SpriteComponents {
-            material: self.material.clone(),
-            transform: Transform::from_translation(Vec3::new(0.0, 16.0, 0.0)),
-            ..Default::default()
-        });
 
         world
-            .insert_one(sprite_entity, Parent(self.entity))
+            .insert_one(self.entity, TransformOffset(Vec3::new(0.0, 16.0, 2.0)))
             .unwrap();
     }
 
     fn generate_transform(position: &Position) -> Transform {
         // todo: merge with the function in map rendering
-        let z = 2.0 + (8 + position.x - position.y) as f32 / 16.0;
+        let z = (7 + position.x - position.y) as f32 / 14.0;
         let translation = utils::convert_position_to_vec2(position).extend(z);
+
+        let translation = translation + Vec3::new(0.0, 16.0, 2.0);
 
         Transform::from_translation(translation)
     }

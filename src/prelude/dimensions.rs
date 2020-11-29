@@ -1,7 +1,7 @@
 
 
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct Dimensions {
     pub width: i32,
     pub height: i32,

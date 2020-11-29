@@ -7,6 +7,9 @@ use crate::prelude::*;
 use unit::{UnitPlugin, Team, UnitCmd};
 use map::{MapPlugin};
 
+pub use map::{Map, Tile};
+pub use unit::{Unit};
+
 
 
 

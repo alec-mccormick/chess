@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use crate::prelude::*;
+use std::collections::HashMap;
 
 
 #[derive(Debug, Bundle)]
@@ -20,6 +21,21 @@ impl ToString for Tile {
         match self {
             Self::Black => "Black".into(),
             Self::White => "White".into()
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct TileStore(pub HashMap<Position, Entity>);
+
+impl TileStore {
+
+    pub fn handle_position_changed(
+        mut store: ResMut<TileStore>,
+        query: Query<With<Tile, (Entity, Changed<Position>)>>
+    ) {
+        for (entity, position) in query.iter() {
+            store.0.insert(*position, entity);
         }
     }
 }

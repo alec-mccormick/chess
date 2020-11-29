@@ -54,8 +54,8 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(CorePlugin)
-        .add_plugin(RenderPlugin)
         .add_plugin(UIPlugin)
+        .add_plugin(RenderPlugin)
         .add_startup_system(setup_map.system())
         .add_startup_system(setup_units.system())
         .run()
@@ -82,6 +82,7 @@ fn setup_map(
                 .with(Parent(map));
         }
     }
+
 
 
 
