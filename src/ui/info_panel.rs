@@ -1,39 +1,46 @@
 
 use bevy::prelude::*;
+use log::{debug};
 use crate::prelude::*;
-
-use crate::core::{GameState, unit::Team};
+use crate::core::{GameState, unit::Team, CreateGameEvent};
 
 pub struct InfoPanelPlugin;
 impl Plugin for InfoPanelPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
             // .add_startup_system(setup.system())
+            .add_system(handle_create_game_event.system())
             .add_system(ActivePlayerView::handle_game_state_changed.system())
         ;
     }
 }
 
-fn setup(
+fn handle_create_game_event(
     mut commands: Commands,
+    mut reader: Local<EventReader<CreateGameEvent>>,
+    events: Res<Events<CreateGameEvent>>,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let font = asset_server.load("fonts/FiraSans-Bold.ttf");
+    for _event in reader.iter(&events) {
+        debug!("handle_create_game_event()");
 
-    commands
-        .spawn(InfoPanelView::bundle(materials.add(Color::NONE.into())))
-        .with(InfoPanelView);
+        let font = asset_server.load("fonts/FiraSans-Bold.ttf");
 
-    commands.with_children(|children| {
-        children
-            .spawn(TextComponents {
-                text: text("Active Player:".into(), font.clone()),
-                ..Default::default()
-            })
-            .with(ActivePlayerView)
-        ;
-    });
+        commands
+            .spawn(InfoPanelView::bundle(materials.add(Color::NONE.into())))
+            .with(InfoPanelView);
+
+        commands.with_children(|children| {
+            children
+                .spawn(TextComponents {
+                    text: text("Active Player:".into(), font.clone()),
+                    ..Default::default()
+                })
+                .with(ActivePlayerView)
+            ;
+        });
+    }
 }
 
 

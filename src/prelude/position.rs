@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::ops::{Add, Deref};
 
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
@@ -21,8 +21,14 @@ impl Add for Position {
     }
 }
 
+impl From<(i32, i32)> for Position {
+    fn from((x, y): (i32, i32)) -> Self {
+        Position::new(x, y)
+    }
+}
 
-
-// pub fn pos(x: i32, y: i32) -> Position {
-//     Position { x, y }
-// }
+impl From<&(i32, i32)> for Position {
+    fn from((x, y): &(i32, i32)) -> Self {
+        Position::new(*x, *y)
+    }
+}

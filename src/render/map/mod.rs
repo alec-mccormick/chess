@@ -188,7 +188,7 @@ fn handle_tile_overlay_changed(
 
         for child in children.iter() {
             if let Ok(mut material) = overlay_query.get_mut(*child) {
-                *material = match tile_overlay_state.deref() {
+                *material = match *tile_overlay_state {
                     TileOverlayState::Invisible => tile_materials.invisible.clone(),
                     TileOverlayState::Visible => tile_materials.hover_overlay.clone()
                 };

@@ -3,12 +3,7 @@ use bevy::{prelude::*, ecs::Command};
 use log::{debug};
 
 use crate::prelude::*;
-use crate::units::*;
-
-use crate::core::{
-    map::{TileComponents, Tile, MapComponents, Map},
-    unit::{UnitComponents, Unit, Team, Health, Actions},
-};
+use crate::core::{Team, CreateGameEvent};
 
 
 
@@ -18,7 +13,8 @@ impl Plugin for MainMenuPlugin {
         app
             .init_resource::<ButtonMaterials>()
             .add_startup_system(spawn_main_menu.system())
-            .add_system_to_stage(stage::PRE_UPDATE, handle_start_button_pressed.system())
+            .add_system(handle_main_menu_button.system())
+            .add_system(handle_start_button.system())
         ;
     }
 }
@@ -27,65 +23,14 @@ impl Plugin for MainMenuPlugin {
 /// ==========================================================================
 /// Main Menu
 /// ==========================================================================
-fn handle_start_button_pressed(
-    mut commands: Commands,
+fn handle_main_menu_button(
     button_materials: Res<ButtonMaterials>,
-    main_menu_query: Query<With<MainMenu, Entity>>,
     mut interaction_query: Query<With<MainMenuButton, (Mutated<Interaction>, &mut Handle<ColorMaterial>)>>,
 ) {
     for (interaction, mut material) in interaction_query.iter_mut() {
         match *interaction {
             Interaction::Clicked => {
-                debug!("handle_start_button_pressed()");
                 *material = button_materials.pressed.clone();
-
-                for entity in main_menu_query.iter() {
-                    commands.despawn_recursive(entity);
-                }
-
-                let map = commands
-                    .spawn(MapComponents::default())
-                    .current_entity()
-                    .unwrap();
-
-                println!("Map Spawned");
-
-                for x in 0..=7 {
-                    for y in 0..=7 {
-                        let position = Position::new(x, y);
-                        let tile = if (x + y) % 2 == 0 { Tile::Black } else { Tile::White };
-
-                        commands
-                            .spawn(TileComponents { tile, position })
-                            .with(Parent(map));
-                    }
-                }
-
-                for x in 0..=7 {
-                    commands.spawn(UnitComponents { team: Team::White, position: Position::new(x, 1), ..pawn() }).with(Parent(map));
-                    commands.spawn(UnitComponents { team: Team::Black, position: Position::new(x, 6), ..pawn() }).with(Parent(map));
-                }
-
-                let team = Team::White;
-                commands.spawn(UnitComponents { team, position: Position::new(0, 0), ..rook() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(1, 0), ..knight() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(2, 0), ..bishop() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(3, 0), ..queen() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(4, 0), ..king() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(5, 0), ..bishop() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(6, 0), ..knight() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(7, 0), ..rook() }).with(Parent(map));
-
-
-                let team = Team::Black;
-                commands.spawn(UnitComponents { team, position: Position::new(0, 7), ..rook() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(1, 7), ..knight() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(2, 7), ..bishop() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(3, 7), ..queen() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(4, 7), ..king() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(5, 7), ..bishop() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(6, 7), ..knight() }).with(Parent(map));
-                commands.spawn(UnitComponents { team, position: Position::new(7, 7), ..rook() }).with(Parent(map));
             }
             Interaction::Hovered => {
                 *material = button_materials.hovered.clone();
@@ -97,13 +42,33 @@ fn handle_start_button_pressed(
     }
 }
 
+fn handle_start_button(
+    mut commands: Commands,
+    mut create_game_events: ResMut<Events<CreateGameEvent>>,
+    main_menu_query: Query<With<MainMenu, Entity>>,
+    interaction_query: Query<With<StartButton, Mutated<Interaction>>>,
+) {
+    let clicks = interaction_query.iter()
+        .filter(|interaction| **interaction == Interaction::Clicked);
+
+    for _ in clicks {
+        for entity in main_menu_query.iter() {
+            commands.despawn_recursive(entity);
+        }
+
+        create_game_events.send(CreateGameEvent {
+            player_name: "Alec".into(),
+            team: Team::White,
+        });
+    }
+}
+
 
 
 /// ==========================================================================
 /// Main Menu
 /// ==========================================================================
 pub struct MainMenu;
-pub struct MainMenuButton;
 
 fn spawn_main_menu(
     mut commands: Commands,
@@ -122,8 +87,7 @@ fn spawn_main_menu(
             material: button_materials.normal.clone(),
             ..Default::default()
         })
-        // .with_bundle((MainMenuButton, Parent(main_menu_entity)))
-        .with_bundle((MainMenu, MainMenuButton))
+        .with_bundle((MainMenu, MainMenuButton, StartButton))
         .with_children(|children| {
             children.spawn(TextComponents {
                 text: Text {
@@ -139,6 +103,9 @@ fn spawn_main_menu(
             });
         });
 }
+
+pub struct StartButton;
+pub struct MainMenuButton;
 
 /// ==========================================================================
 /// Resources
