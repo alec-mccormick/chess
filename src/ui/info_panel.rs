@@ -5,11 +5,10 @@ use crate::prelude::*;
 use crate::core::{GameState, unit::Team};
 
 pub struct InfoPanelPlugin;
-
 impl Plugin for InfoPanelPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
-            .add_startup_system(setup.system())
+            // .add_startup_system(setup.system())
             .add_system(ActivePlayerView::handle_game_state_changed.system())
         ;
     }
@@ -32,21 +31,14 @@ fn setup(
                 text: text("Active Player:".into(), font.clone()),
                 ..Default::default()
             })
-            .with(ActivePlayerView);
-
-        // children
-        //     .spawn(TextComponents {
-        //         text: text("Selected Unit:".into(), font.clone()),
-        //         ..Default::default()
-        //     })
-        //     .with(SelectedUnitView);
+            .with(ActivePlayerView)
+        ;
     });
 }
 
 
 
 struct InfoPanelView;
-
 impl InfoPanelView {
     fn bundle(material: Handle<ColorMaterial>) -> NodeComponents {
         NodeComponents {
@@ -69,7 +61,6 @@ impl InfoPanelView {
 
 
 struct ActivePlayerView;
-
 impl ActivePlayerView {
     fn handle_game_state_changed(
         state: ChangedRes<GameState>,
@@ -78,25 +69,12 @@ impl ActivePlayerView {
         println!("Handle game state changed!!!");
 
         for mut text in query.iter_mut() {
-            let team = match state.active_team {
-                Team::Black => String::from("Black"),
-                Team::White => String::from("White"),
-            };
-
+            let team = state.active_team.to_string();
             (*text).value = format!("Active Team: [{}]", team);
         }
     }
 }
 
-// struct SelectedUnitView;
-//
-// impl SelectedUnitView {
-//     fn handle_unit_selected(
-//
-//     ) {
-//
-//     }
-// }
 
 
 // ==============================================================================

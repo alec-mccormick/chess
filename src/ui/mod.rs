@@ -2,6 +2,7 @@ pub mod info_panel;
 mod sprite_interaction;
 mod map;
 mod input;
+mod main_menu;
 
 
 use bevy::prelude::*;
@@ -13,6 +14,9 @@ use crate::core::{
     unit::{UnitStore, UnitCmd, Unit, Actions, Team, Health, is_action_valid}
 };
 
+use main_menu::MainMenuPlugin;
+use info_panel::InfoPanelPlugin;
+
 
 pub struct UIPlugin;
 impl Plugin for UIPlugin {
@@ -20,6 +24,7 @@ impl Plugin for UIPlugin {
         app
             .add_resource(input::InputState::Default)
             .add_startup_system(setup.system())
+            .add_plugin(MainMenuPlugin)
             .add_plugin(info_panel::InfoPanelPlugin)
             .add_plugin(map::MapUIPlugin)
             .add_system(sprite_interaction::sprite_interaction_system.system())

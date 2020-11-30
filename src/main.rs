@@ -10,7 +10,7 @@ use chess::core::{
 };
 
 use chess::render::RenderPlugin;
-use chess::ui::UIPlugin;
+use chess::ui::{UIPlugin};
 
 use chess::units::*;
 
@@ -27,8 +27,8 @@ use chess::units::*;
 /// x Update rendering to isometric
 /// - Add Networking
 /// - Migrate to using SpriteConfig
-/// - Add Bot UI
-/// - Add startup screen
+/// - Add Bot AI
+/// x Add startup screen
 ///     - Allow user to select team
 /// - Build Action UI
 ///     - Add Icon
@@ -53,8 +53,8 @@ fn main() {
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugin(CorePlugin)
         .add_plugin(UIPlugin)
+        .add_plugin(CorePlugin)
         .add_plugin(RenderPlugin)
         .add_startup_system(setup_map.system())
         .add_startup_system(setup_units.system())
@@ -64,65 +64,49 @@ fn main() {
 
 fn setup_map(
     mut commands: Commands,
-    // mut materials: ResMut<Assets<ColorMaterial>>,
-    // mut meshes: ResMut<Assets<Mesh>>,
 ) {
-    let map = commands
-        .spawn(MapComponents::default())
-        .current_entity()
-        .unwrap();
 
-    for x in 0..=7 {
-        for y in 0..=7 {
-            let position = Position::new(x, y);
-            let tile = if (x + y) % 2 == 0 { Tile::Black } else { Tile::White };
-
-            commands
-                .spawn(TileComponents { tile, position })
-                .with(Parent(map));
-        }
-    }
-
-
-
-
-    // let material = materials.add(Color::rgb(0.8, 0.0, 0.0).into());
+    // let map = commands
+    //     .spawn(MapComponents::default())
+    //     .current_entity()
+    //     .unwrap();
     //
-    // commands.spawn(primitive(
-    //     material.clone(),
-    //     &mut meshes,
-    //     ShapeType::Circle(20.0),
-    //     TessellationMode::Fill(&FillOptions::default()),
-    //     Vec3::new(0.0, 0.0, 50.0),
-    // ));
-
-    for x in 0..=7 {
-        commands.spawn(UnitComponents { team: Team::White, position: Position::new(x, 1), ..pawn() }).with(Parent(map));
-        commands.spawn(UnitComponents { team: Team::Black, position: Position::new(x, 6), ..pawn() }).with(Parent(map));
-    }
-
-    let team = Team::White;
-
-    commands.spawn(UnitComponents { team, position: Position::new(0, 0), ..rook() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(1, 0), ..knight() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(2, 0), ..bishop() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(3, 0), ..queen() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(4, 0), ..king() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(5, 0), ..bishop() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(6, 0), ..knight() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(7, 0), ..rook() }).with(Parent(map));
-
-
-    let team = Team::Black;
-
-    commands.spawn(UnitComponents { team, position: Position::new(0, 7), ..rook() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(1, 7), ..knight() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(2, 7), ..bishop() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(3, 7), ..queen() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(4, 7), ..king() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(5, 7), ..bishop() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(6, 7), ..knight() }).with(Parent(map));
-    commands.spawn(UnitComponents { team, position: Position::new(7, 7), ..rook() }).with(Parent(map));
+    // for x in 0..=7 {
+    //     for y in 0..=7 {
+    //         let position = Position::new(x, y);
+    //         let tile = if (x + y) % 2 == 0 { Tile::Black } else { Tile::White };
+    //
+    //         commands
+    //             .spawn(TileComponents { tile, position })
+    //             .with(Parent(map));
+    //     }
+    // }
+    //
+    // for x in 0..=7 {
+    //     commands.spawn(UnitComponents { team: Team::White, position: Position::new(x, 1), ..pawn() }).with(Parent(map));
+    //     commands.spawn(UnitComponents { team: Team::Black, position: Position::new(x, 6), ..pawn() }).with(Parent(map));
+    // }
+    //
+    // let team = Team::White;
+    // commands.spawn(UnitComponents { team, position: Position::new(0, 0), ..rook() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(1, 0), ..knight() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(2, 0), ..bishop() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(3, 0), ..queen() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(4, 0), ..king() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(5, 0), ..bishop() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(6, 0), ..knight() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(7, 0), ..rook() }).with(Parent(map));
+    //
+    //
+    // let team = Team::Black;
+    // commands.spawn(UnitComponents { team, position: Position::new(0, 7), ..rook() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(1, 7), ..knight() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(2, 7), ..bishop() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(3, 7), ..queen() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(4, 7), ..king() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(5, 7), ..bishop() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(6, 7), ..knight() }).with(Parent(map));
+    // commands.spawn(UnitComponents { team, position: Position::new(7, 7), ..rook() }).with(Parent(map));
 }
 
 fn setup_units(mut commands: Commands, query: Query<(Entity, &Map)>) {

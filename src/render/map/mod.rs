@@ -36,6 +36,8 @@ pub fn handle_map_spawned(
     query: Query<(Entity, &Dimensions, Added<Map>)>,
 ) {
     for (entity, _dimensions, _map) in query.iter() {
+        debug!("handle_map_spawned()");
+
         commands.add_command(RenderMapCmd { entity });
     }
 }
@@ -94,6 +96,8 @@ fn handle_tile_spawned(
     query: Query<(Entity, &Position, Added<Tile>)>,
 ) {
     for (entity, _position, tile) in query.iter() {
+        debug!("handle_tile_spawned()");
+
         let material = materials.get_material(tile);
         commands.add_command(RenderTileCmd { entity, material });
 

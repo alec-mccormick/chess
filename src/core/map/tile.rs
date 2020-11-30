@@ -9,7 +9,6 @@ pub struct TileComponents {
     pub position: Position,
 }
 
-
 #[derive(Debug)]
 pub enum Tile {
     Black,
@@ -20,7 +19,7 @@ impl ToString for Tile {
     fn to_string(&self) -> String {
         match self {
             Self::Black => "Black".into(),
-            Self::White => "White".into()
+            Self::White => "White".into(),
         }
     }
 }
