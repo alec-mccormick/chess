@@ -66,7 +66,7 @@ fn handle_tile_spawned(
 
         commands
             .insert(entity, MeshComponents::default())
-            .insert_one(entity, TileOverlayState::Invisible);
+            .insert(entity, (TileOverlayState::Invisible, Interaction::None));
 
         TileOverlay::spawn(&mut commands, &mut meshes, materials.invisible.clone(), entity);
 
@@ -118,7 +118,7 @@ impl TileOverlay {
                     Point::new(0.0, -HALF_TILE_RENDER_HEIGHT_PX as f32)
                 ),
                 TessellationMode::Fill(&FillOptions::default()),
-                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 0.1),
             ))
             .with(TileOverlay)
             .with(Parent(parent));

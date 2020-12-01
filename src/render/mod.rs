@@ -18,7 +18,7 @@ impl Plugin for RenderPlugin {
             .add_plugin(map::RenderMapPlugin)
             .add_plugin(unit::RenderUnitPlugin)
             .add_startup_system(setup.system())
-            .add_system_to_stage(stage::UPDATE, handle_position_update.system())
+            .add_system_to_stage(stage::POST_UPDATE, handle_position_update.system())
         ;
     }
 }

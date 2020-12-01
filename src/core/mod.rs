@@ -26,7 +26,7 @@ impl Plugin for CorePlugin {
             .add_event::<CreateGameEvent>()
             .add_plugin(MapPlugin)
             .add_plugin(UnitPlugin)
-            .add_system_to_stage(stage::PRE_UPDATE, Game::handle_create_game_event.system())
+            .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_create_game_event.system())
             .add_resource(GameState::default())
             .add_system(GameState::handle_unit_cmd.system())
         ;

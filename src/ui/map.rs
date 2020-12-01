@@ -5,7 +5,7 @@ use bevy_prototype_lyon::prelude::*;
 
 
 use crate::core::{Tile, Map, map::TileStore, unit::{Actions, Unit, Team, Health, UnitStore}};
-use log::{trace};
+use log::{info};
 use std::cmp::Ordering;
 
 use std::collections::BTreeSet;
@@ -40,17 +40,17 @@ pub fn handle_input_state_change(
     mut tile_query: Query<(&Tile, &mut TileOverlayState)>,
     action_query: Query<(&Unit, &Position, &Team, &Health, &Actions)>,
 ) {
-    println!("!!!handle_input_state_change() {:?}, previous: {:?}", *input_state, *previous_state);
+    info!("handle_input_state_change() {:?}, previous: {:?}", *input_state, *previous_state);
 
     match *input_state {
         InputState::UnitSelected(entity) => {
-            println!("! unit selected");
+            info!("! unit selected");
 
             let actions = action_query.get_component::<Actions>(entity.clone()).unwrap();
             let action = actions.get(0).unwrap();
 
             for target in action.list_targets(&entity, &unit_store, &action_query) {
-                println!("! Target {:?}", target);
+                info!("! Target {:?}", target);
 
                 let tile_entity = tile_store.0.get(&target).unwrap();
 
@@ -67,7 +67,7 @@ pub fn handle_input_state_change(
                 let action = actions.get(0).unwrap();
 
                 for target in action.list_targets(&entity, &unit_store, &action_query) {
-                    println!("! Target {:?}", target);
+                    info!("! Target {:?}", target);
 
                     let tile_entity = tile_store.0.get(&target).unwrap();
 

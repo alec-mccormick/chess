@@ -3,7 +3,7 @@ use bevy::prelude::*;
 
 use log::{trace};
 
-use chess::prelude::*;
+
 
 use chess::core::{CorePlugin};
 
@@ -37,7 +37,7 @@ fn main() {
 }
 
 fn print_frame() {
-    trace!("New frame");
+    // trace!("New frame");
 }
 
 // fn setup(

@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use crate::prelude::*;
 
+use log::{info};
+
 use crate::core::{
     GameState, Tile,
     unit::{UnitStore, UnitCmd, Unit, Actions, Team, Health, is_action_valid}
@@ -26,17 +28,17 @@ pub fn handle_tile_interaction(
                 match *input_state {
                     InputState::Default => {
                         if let Some(entity) = unit_store.get_unit(position) {
-                            println!("-- unit selected: {:?}", entity);
+                            info!("-- unit selected: {:?}", entity);
 
                             let team = action_query
                                 .get_component::<Team>(*entity)
                                 .unwrap();
 
                             if team.eq(&game_state.active_team) {
-                                println!("Unit for active team selected");
+                                info!("Unit for active team selected");
                                 *input_state = InputState::UnitSelected(*entity);
                             } else {
-                                println!("Inactive unit selected");
+                                info!("Inactive unit selected");
                             }
                         }
                     },
@@ -45,7 +47,7 @@ pub fn handle_tile_interaction(
                         let action = actions.get(0).unwrap();
 
                         if is_action_valid(action, &entity, position, &unit_store, &action_query) {
-                            println!("Execute action {:?}", entity);
+                            info!("Execute action {:?}", entity);
                             cmds.send(UnitCmd::ExecuteAction(entity, 0, *position));
                         }
 
@@ -54,7 +56,7 @@ pub fn handle_tile_interaction(
                 }
             }
             Interaction::Hovered => {
-                println!("Hover {:?}", position);
+                info!("Hover {:?}", position);
             }
             Interaction::None => {
                 // println!("None {:?}", position);

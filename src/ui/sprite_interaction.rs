@@ -28,7 +28,7 @@ pub fn sprite_interaction_system(
     if let Some(cursor_moved) = state.cursor_moved_event_reader.latest(&cursor_moved_events) {
         state.cursor_position = cursor_moved.position;
         cursor_changed = true;
-        trace!("Cursor position: {:?}", cursor_moved.position);
+        // trace!("Cursor position: {:?}", cursor_moved.position);
     }
     if let Some(touch) = touches_input.get_pressed(0) {
         state.cursor_position = touch.position;
@@ -47,6 +47,9 @@ pub fn sprite_interaction_system(
 
     let tile_size = Vec2::new(HALF_TILE_RENDER_WIDTH_PX as f32, HALF_TILE_RENDER_HEIGHT_PX as f32);
 
+    trace!("Screen Center: {:?}", center);
+    trace!("Cursor Position normalized: {:?}", cursor_position);
+
     let mut potential_tiles = query
         .iter_mut()
         .filter_map(|(entity, tile, global_transform, interaction)| {
@@ -63,6 +66,8 @@ pub fn sprite_interaction_system(
             None
         })
         .collect::<Vec<_>>();
+
+    trace!("Potential hovered tiles length: {}", potential_tiles.len());
 
     potential_tiles.sort_by(|(_, _, _, _, _, a), (_, _, _, _, _, b)| {
         a.y().partial_cmp(&b.y()).unwrap()
