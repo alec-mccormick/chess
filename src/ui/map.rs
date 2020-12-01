@@ -16,18 +16,6 @@ use crate::render::map::{TileMaterials, TileOverlayState};
 use super::input::InputState;
 use std::ops::Deref;
 
-pub struct MapUIPlugin;
-
-impl Plugin for MapUIPlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app
-            // .add_resource(MapUIStore::default())
-            // .add_system(handle_map_spawned.system())
-            // .add_system(handle_tile_spawned.system())
-            // .add_system(tile_interaction_system.system())
-        ;
-    }
-}
 
 /// ==========================================================================
 /// Input State
@@ -61,7 +49,7 @@ pub fn handle_input_state_change(
                 }
             }
         }
-        InputState::Default => {
+        InputState::Idle => {
             if let Some(InputState::UnitSelected(entity)) = *previous_state {
                 let actions = action_query.get_component::<Actions>(entity.clone()).unwrap();
                 let action = actions.get(0).unwrap();

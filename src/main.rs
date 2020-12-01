@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 // use bevy_prototype_networking_laminar::{NetworkingPlugin, NetworkResource};
 
-use log::{trace};
+use log::{info};
 
 
 
@@ -31,7 +31,7 @@ fn main() {
         .add_plugin(CorePlugin)
         .add_plugin(UIPlugin)
         .add_plugin(RenderPlugin)
-        // .add_startup_system(setup.system())
+        .add_startup_system(setup.system())
         .run()
     ;
 }
@@ -40,8 +40,15 @@ fn print_frame() {
     // trace!("New frame");
 }
 
-// fn setup(
-//     // mut net: ResMut<NetworkResource>
-// ) {
-//     // net.bind("0.0.0.0:12345").unwrap();
-// }
+fn setup(
+    // mut net: ResMut<NetworkResource>
+    mut commands: Commands,
+    mut events: ResMut<Events<chess::ui::CreateMainMenuEvent>>,
+) {
+    // net.bind("0.0.0.0:12345").unwrap();
+    info!("App Setup - Spawning Main Menu");
+
+    events.send(chess::ui::CreateMainMenuEvent);
+
+    // commands.spawn((chess::ui::MainMenu,));
+}
