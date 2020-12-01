@@ -14,7 +14,7 @@ impl Plugin for MainMenuPlugin {
             .init_resource::<ButtonMaterials>()
             .add_startup_system(spawn_main_menu.system())
             .add_system(handle_main_menu_button.system())
-            .add_system(handle_start_button.system())
+            .add_system_to_stage(stage::UPDATE, handle_start_button.system())
         ;
     }
 }
@@ -28,16 +28,10 @@ fn handle_main_menu_button(
     mut interaction_query: Query<With<MainMenuButton, (Mutated<Interaction>, &mut Handle<ColorMaterial>)>>,
 ) {
     for (interaction, mut material) in interaction_query.iter_mut() {
-        match *interaction {
-            Interaction::Clicked => {
-                *material = button_materials.pressed.clone();
-            }
-            Interaction::Hovered => {
-                *material = button_materials.hovered.clone();
-            }
-            Interaction::None => {
-                *material = button_materials.normal.clone();
-            }
+        *material = match *interaction {
+            Interaction::Clicked => button_materials.pressed.clone(),
+            Interaction::Hovered => button_materials.hovered.clone(),
+            Interaction::None => button_materials.normal.clone(),
         }
     }
 }
@@ -56,6 +50,7 @@ fn handle_start_button(
             commands.despawn_recursive(entity);
         }
 
+        debug!("handle_start_button() - Start Button Pressed");
         create_game_events.send(CreateGameEvent {
             player_name: "Alec".into(),
             team: Team::White,

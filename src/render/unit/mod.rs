@@ -29,45 +29,10 @@ fn handle_unit_spawned(
 ) {
     for (entity, unit, team, _position) in query.iter() {
         let material = materials.get_unit_material(&*unit, team);
-        commands.add_command(RenderUnitCmd { entity, material });
-    }
-}
 
-#[derive(Clone)]
-struct RenderUnitCmd {
-    entity: Entity,
-    material: Handle<ColorMaterial>,
-}
-
-impl Command for RenderUnitCmd {
-    fn write(self: Box<Self>, world: &mut World, _: &mut Resources) {
-        self.insert_sprite(world);
-    }
-}
-
-impl RenderUnitCmd {
-    fn insert_sprite(&self, world: &mut World) {
-        let position = world.get::<Position>(self.entity).unwrap();
-
-        world.insert(self.entity, SpriteComponents {
-            material: self.material.clone(),
-            transform: Self::generate_transform(position),
-            ..Default::default()
-        }).unwrap();
-
-        world
-            .insert_one(self.entity, TransformOffset(Vec3::new(0.0, 16.0, 2.0)))
-            .unwrap();
-    }
-
-    fn generate_transform(position: &Position) -> Transform {
-        // todo: merge with the function in map rendering
-        let z = (7 + position.x - position.y) as f32 / 14.0;
-        let translation = utils::convert_position_to_vec2(position).extend(z);
-
-        let translation = translation + Vec3::new(0.0, 16.0, 2.0);
-
-        Transform::from_translation(translation)
+        commands
+            .insert(entity, SpriteComponents { material, ..Default::default() })
+            .insert_one(entity, TransformOffset(Vec3::new(0.0, 16.0, 2.0)));
     }
 }
 

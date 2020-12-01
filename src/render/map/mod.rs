@@ -1,14 +1,13 @@
-use bevy::{prelude::*, ecs::Command};
+use bevy::{prelude::*, ecs::Command, render::camera::Camera};
 use std::{ops::Deref, cmp::max};
-use log::{debug};
-use lyon::{math::Point};
+use log::{debug, trace};
+use lyon::math::Point;
 
 use bevy_prototype_lyon::prelude::*;
 
 use crate::prelude::*;
 use crate::core::map::{Map, Tile};
-use super::utils;
-use crate::render::utils::{HALF_TILE_RENDER_WIDTH_PX, HALF_TILE_RENDER_HEIGHT_PX};
+use super::utils::{self, HALF_TILE_RENDER_WIDTH_PX, HALF_TILE_RENDER_HEIGHT_PX};
 
 
 /// ==========================================================================
@@ -22,11 +21,13 @@ impl Plugin for RenderMapPlugin {
             .init_resource::<TileMaterials>()
             .add_system(handle_map_spawned.system())
             .add_system(handle_tile_spawned.system())
-            .add_system(handle_tile_overlay_changed.system())
+            .add_system_to_stage(stage::UPDATE, TileOverlay::handle_state_changed.system())
         ;
     }
 }
 
+
+pub struct GameCamera;
 
 /// ==========================================================================
 /// Map Rendering
@@ -35,55 +36,18 @@ pub fn handle_map_spawned(
     mut commands: Commands,
     query: Query<(Entity, &Dimensions, Added<Map>)>,
 ) {
-    for (entity, _dimensions, _map) in query.iter() {
-        debug!("handle_map_spawned()");
+    for (entity, dimensions, _map) in query.iter() {
+        debug!("handle_map_spawned() - Insert Mesh components for rendering");
 
-        commands.add_command(RenderMapCmd { entity });
-    }
-}
+        let scale = Vec3::splat(2.5);
+        let translation = utils::convert_dimensions_to_map_offset(dimensions) * scale;
 
-/// Element to contain map and control map scale.
-#[derive(Clone, Copy)]
-pub struct MapContainer;
-
-/// Command to make a draw a map & position it in the screen.
-#[derive(Clone, Copy)]
-struct RenderMapCmd {
-    entity: Entity,
-}
-
-impl Command for RenderMapCmd {
-    fn write(self: Box<Self>, world: &mut World, _: &mut Resources) {
-        let map_container_entity = self.spawn_container(world);
-        self.insert_map_mesh(world, map_container_entity);
-    }
-}
-
-impl RenderMapCmd {
-    fn spawn_container(&self, world: &mut World) -> Entity {
-        let entity = world.spawn(MeshComponents {
-            transform: Transform::from_scale(Vec3::splat(2.5)),
+        commands.insert(entity, MeshComponents {
+            transform: Transform { translation, scale, ..Default::default() },
             ..Default::default()
         });
-
-        world.insert_one(entity, MapContainer).unwrap();
-        entity
-    }
-
-    fn insert_map_mesh(&self, world: &mut World, parent: Entity) {
-        let dimensions = world.get::<Dimensions>(self.entity).unwrap();
-
-        let translation = utils::convert_dimensions_to_map_offset(dimensions);
-
-        world.insert(self.entity, MeshComponents {
-            transform: Transform::from_translation(translation),
-            ..Default::default()
-        }).unwrap();
-
-        world.insert_one(self.entity, Parent(parent)).unwrap();
     }
 }
-
 
 
 /// ==========================================================================
@@ -93,35 +57,37 @@ fn handle_tile_spawned(
     mut commands: Commands,
     materials: Res<TileMaterials>,
     mut meshes: ResMut<Assets<Mesh>>,
-    query: Query<(Entity, &Position, Added<Tile>)>,
+    query: Query<(Entity, Added<Tile>)>,
 ) {
-    for (entity, _position, tile) in query.iter() {
-        debug!("handle_tile_spawned()");
+    for (entity, tile) in query.iter() {
+        trace!("handle_tile_spawned() - Add sprite to tile");
 
         let material = materials.get_material(tile);
-        commands.add_command(RenderTileCmd { entity, material });
-
-        commands.insert_one(entity, TileOverlayState::Invisible);
 
         commands
-            .spawn(primitive(
-                materials.invisible.clone(),
-                &mut meshes,
-                // ShapeType::Circle(8.0),
-                ShapeType::Quad(
-                    Point::new(-HALF_TILE_RENDER_WIDTH_PX as f32, 0.0),
-                    Point::new(0.0, HALF_TILE_RENDER_HEIGHT_PX as f32),
-                    Point::new(HALF_TILE_RENDER_WIDTH_PX as f32, 0.0),
-                    Point::new(0.0, -HALF_TILE_RENDER_HEIGHT_PX as f32)
-                ),
-                TessellationMode::Fill(&FillOptions::default()),
-                Vec3::new(0.0, 0.0, 10.0),
-            ))
-            .with(TileOverlay)
+            .insert(entity, MeshComponents::default())
+            .insert_one(entity, TileOverlayState::Invisible);
+
+        TileOverlay::spawn(&mut commands, &mut meshes, materials.invisible.clone(), entity);
+
+        commands
+            .spawn(SpriteComponents {
+                material,
+                transform: Transform {
+                    translation: Vec3::new(0.0, -16.0, 0.0),    // offset sprite 16 px down
+                    ..Default::default()
+                },
+                ..Default::default()
+            })
             .with(Parent(entity));
     }
 }
 
+
+
+/// ==========================================================================
+/// Tile Overlay
+/// ==========================================================================
 #[derive(Debug)]
 pub struct TileOverlay;
 
@@ -131,67 +97,48 @@ pub enum TileOverlayState {
     Visible,
 }
 
-struct RenderTileCmd {
-    entity: Entity,
-    material: Handle<ColorMaterial>,
-}
+impl TileOverlay {
 
-impl Command for RenderTileCmd {
-    fn write(self: Box<Self>, world: &mut World, _resources: &mut Resources) {
-        self.insert_mesh(world);
-        self.spawn_sprite(world);
-    }
-}
+    fn spawn(
+        commands: &mut Commands,
+        meshes: &mut ResMut<Assets<Mesh>>,
+        material: Handle<ColorMaterial>,
+        parent: Entity,
+    ) {
+        trace!("TileOverlay::spawn()");
 
-impl RenderTileCmd {
-    fn insert_mesh(&self, world: &mut World) {
-        let position = world.get::<Position>(self.entity).unwrap();
-
-        world.insert(self.entity, MeshComponents {
-            transform: Self::generate_transform(position),
-            ..Default::default()
-        }).unwrap();
-    }
-
-    fn spawn_sprite(&self, world: &mut World) {
-        let sprite_entity = world.spawn(SpriteComponents {
-            material: self.material.clone(),
-            transform: Transform {
-                translation: Vec3::new(0.0, -16.0, 0.0),    // offset sprite 16 px down
-                ..Default::default()
-            },
-            ..Default::default()
-        });
-
-        world.insert_one(sprite_entity, Parent(self.entity)).unwrap();
+        commands
+            .spawn(primitive(
+                material,
+                meshes,
+                ShapeType::Quad(
+                    Point::new(-HALF_TILE_RENDER_WIDTH_PX as f32, 0.0),
+                    Point::new(0.0, HALF_TILE_RENDER_HEIGHT_PX as f32),
+                    Point::new(HALF_TILE_RENDER_WIDTH_PX as f32, 0.0),
+                    Point::new(0.0, -HALF_TILE_RENDER_HEIGHT_PX as f32)
+                ),
+                TessellationMode::Fill(&FillOptions::default()),
+                Vec3::new(0.0, 0.0, 0.0),
+            ))
+            .with(TileOverlay)
+            .with(Parent(parent));
     }
 
-    fn generate_transform(position: &Position) -> Transform {
-        // todo: update to use max dimension of map entity instead
-        let z = (7 + position.x - position.y) as f32 / 14.0;
-        let translation = utils::convert_position_to_vec2(position).extend(z);
+    fn handle_state_changed(
+        tile_materials: Res<TileMaterials>,
+        tile_query: Query<With<Tile, (Changed<TileOverlayState>, &Children)>>,
+        mut overlay_query: Query<With<TileOverlay, &mut Handle<ColorMaterial>>>
+    ) {
+        for (tile_overlay_state, children) in tile_query.iter() {
+            debug!("TileOverlay::handle_tile_overlay_changed() {:?}", *tile_overlay_state);
 
-        Transform::from_translation(translation)
-    }
-}
-
-/// ==========================================================================
-/// Tile Overlay
-/// ==========================================================================
-fn handle_tile_overlay_changed(
-    tile_materials: Res<TileMaterials>,
-    tile_query: Query<With<Tile, (Changed<TileOverlayState>, &Children)>>,
-    mut overlay_query: Query<With<TileOverlay, &mut Handle<ColorMaterial>>>
-) {
-    for (tile_overlay_state, children) in tile_query.iter() {
-        debug!("handle_tile_overlay_changed() {:?}", *tile_overlay_state);
-
-        for child in children.iter() {
-            if let Ok(mut material) = overlay_query.get_mut(*child) {
-                *material = match *tile_overlay_state {
-                    TileOverlayState::Invisible => tile_materials.invisible.clone(),
-                    TileOverlayState::Visible => tile_materials.hover_overlay.clone()
-                };
+            for child in children.iter() {
+                if let Ok(mut material) = overlay_query.get_mut(*child) {
+                    *material = match *tile_overlay_state {
+                        TileOverlayState::Invisible => tile_materials.invisible.clone(),
+                        TileOverlayState::Visible => tile_materials.hover_overlay.clone()
+                    };
+                }
             }
         }
     }

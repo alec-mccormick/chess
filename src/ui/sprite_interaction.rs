@@ -28,7 +28,7 @@ pub fn sprite_interaction_system(
     if let Some(cursor_moved) = state.cursor_moved_event_reader.latest(&cursor_moved_events) {
         state.cursor_position = cursor_moved.position;
         cursor_changed = true;
-        // trace!("cursor position: {:?}", cursor_moved.position);
+        trace!("Cursor position: {:?}", cursor_moved.position);
     }
     if let Some(touch) = touches_input.get_pressed(0) {
         state.cursor_position = touch.position;

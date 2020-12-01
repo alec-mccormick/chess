@@ -27,9 +27,9 @@ impl Plugin for UIPlugin {
             .add_plugin(MainMenuPlugin)
             .add_plugin(info_panel::InfoPanelPlugin)
             .add_plugin(map::MapUIPlugin)
-            .add_system(sprite_interaction::sprite_interaction_system.system())
-            .add_system(input::handle_tile_interaction.system())
-            .add_system(map::handle_input_state_change.system())
+            .add_system_to_stage(stage::PRE_UPDATE, sprite_interaction::sprite_interaction_system.system())
+            .add_system_to_stage(stage::UPDATE, input::handle_tile_interaction.system())
+            .add_system_to_stage(stage::UPDATE,map::handle_input_state_change.system())
         ;
     }
 }
