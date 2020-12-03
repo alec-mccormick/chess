@@ -26,15 +26,14 @@ struct MainMenuSpawner {
 }
 
 impl EntitySpawner for MainMenuSpawner {
-
-    fn spawn(self, commands: &mut Commands) {
+    fn spawn<'a>(&self, commands: &'a mut Commands) -> &'a mut Commands {
         commands
             .spawn(Self::node_components())
             .with(MainMenu)
             .with_children(|commands| {
-                self.start_button.spawn_as_child(commands);
-                commands.with(StartButton);
-            });
+                self.start_button.spawn_as_child(commands)
+                    .with(StartButton);
+            })
     }
 }
 
@@ -71,13 +70,13 @@ struct MainMenuButtonSpawner {
 
 impl ChildEntitySpawner for MainMenuButtonSpawner {
 
-    fn spawn_as_child(self, commands: &mut ChildBuilder) {
+    fn spawn_as_child<'a, 'b>(&self, commands: &'a mut ChildBuilder<'b>) -> &'a mut ChildBuilder<'b> {
         commands
             .spawn(self.button_components())
             .with(MainMenuButton)
             .with_children(|commands| {
                 commands.spawn(self.text_components());
-            });
+            })
     }
 }
 

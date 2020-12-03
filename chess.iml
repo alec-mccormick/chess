@@ -5,7 +5,9 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/old" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/crates/bevy_networking/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/crates/bevy_networking/target" />
       <excludeFolder url="file://$MODULE_DIR$/scratch" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>

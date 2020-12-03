@@ -1,0 +1,16 @@
+[package]
+name = "bevy_networking"
+version = "0.1.0"
+authors = ["alec-mccormick <alec.s.mccormick@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = "0.3"
+laminar = "0.4.0"
+crossbeam-channel = "0.4.3"                   # threaded communication
+bytes = "0.5.6"                               # plumbing message payloads
+uuid = { version = "0.8", features = ["v4"] } # socket handles
+
+

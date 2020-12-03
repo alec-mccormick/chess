@@ -1,36 +1,46 @@
 ## Chess
 
+To run in debug mode:
 ```
-# cargo 
+# RUST_LOG=chess=debug cargo run
 ```
 
-## Todos
+## Roadmap
 
-- x GameState, swap turns with each move (needs to be fixed to not work on invalid moves)
-- x Validate move before executing
-- x Highlight moves
-- x Show current player with text
-- x Implement attacking
-    - x Handle health changes in various modules (despawn + remove sprite)
-- x Implement Knight
-- x Implement King
-- x Add robust logging
-- x Update rendering to isometric
-- Add Networking
-- Migrate to using SpriteConfig
-- Add Bot AI
-- x Add startup screen
-    - Allow user to select team
-- Build Action UI
-    - Add Icon
-    - Add Description
-- Add State Machine
-- Add events for action executed, etc.
-- Update Action to no longer rely on Query
-    - Maintain internal list of all units in UnitStore?
-    - Migrate to ObjectId
+- [x] GameState, swap turns with each move (needs to be fixed to not work on invalid moves)
+- [x] Validate move before executing
+- [x] Highlight moves
+- [x] Show current player with text
+- [x] Implement attacking
+    - [x] Handle health changes in various modules (despawn + remove sprite)
+- [x] Implement Knight
+- [x] Implement King
+- [x] Add robust logging
+- [x] Update rendering to isometric
+- [ ] Add Networking
+- [ ] Migrate to using SpriteConfig
+- [ ] Add Bot AI
+- [ ] Show movable squares on hover
+- [x] Add startup screen
+    - [ ] Allow user to select team
+- [ ] Build Action UI
+    - [ ] Add Icon
+    - [ ] Add Description
+- [ ] Add State Machine
+- [ ] Add events for action executed, etc.
+- [ ] Update Action to no longer rely on Query
+    - [ ] Maintain internal list of all units in UnitStore?
+    - [ ] Migrate to ObjectId
 
 
+### Gameplay Thoughts
+
+- Explore mtg like synergies in tactical gameplay
+- Consider what makes synergy preferable to "just good shit" squads.
+    - large bloated reward systems tend to be less synergistic. Turning down rewards in STS
+      is often better than taking them.
+
+    
 ## Bevy Stages
 
 ```
