@@ -8,18 +8,16 @@ use bytes::Bytes;
 use laminar::{Packet, Socket, SocketEvent};
 
 use super::error::NetworkError;
-use super::{Connection, Message, NetworkEvent, NetworkResource, SocketHandle, WorkerInstructions};
+use super::{Connection, NetworkEvent, NetworkResource, SocketHandle};
+use super::types::{WorkerInstructions, Message};
 
 const SEND_EXPECT: &str =
     "The networking worker thread is no longer able to send messages back to the receiver.";
 
 pub fn start_worker_thread() -> NetworkResource {
-    let (mut event_tx, event_rx): (Sender<NetworkEvent>, Receiver<NetworkEvent>) = unbounded();
-    let (message_tx, message_rx): (Sender<Message>, Receiver<Message>) = unbounded();
-    let (instruction_tx, instruction_rx): (
-        Sender<WorkerInstructions>,
-        Receiver<WorkerInstructions>,
-    ) = unbounded();
+    let (mut event_tx, event_rx) = unbounded::<NetworkEvent>();
+    let (message_tx, message_rx) = unbounded::<Message>();
+    let (instruction_tx, instruction_rx) = unbounded::<WorkerInstructions>();
 
     let mut sockets = TrackedSockets {
         sockets: Vec::new(),

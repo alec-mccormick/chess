@@ -7,10 +7,10 @@ use std::{
 };
 
 use super::{
-    Message, WorkerInstructions,
     error::NetworkError,
     events::NetworkEvent,
-    types::{Connection, SendConfig, SocketHandle}
+    types::{Connection, SendConfig, SocketHandle, Message, WorkerInstructions, NetworkDelivery},
+    transport::{LaminarConfig, Transport},
 };
 
 

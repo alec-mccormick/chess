@@ -7,11 +7,12 @@ mod error;
 mod resources;
 mod events;
 mod worker;
+mod transport;
 
 
 pub use error::NetworkError;
 pub use events::NetworkEvent;
-pub use types::{Connection, SendConfig, SocketHandle};
+pub use types::{Connection, SendConfig, SocketHandle, NetworkDelivery};
 pub use resources::NetworkResource;
 
 

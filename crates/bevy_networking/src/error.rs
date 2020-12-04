@@ -6,7 +6,7 @@ use std::io;
 use std::sync::{MutexGuard, PoisonError};
 
 // use super::{Message, SocketHandle, WorkerInstructions};
-use super::types::{SocketHandle};
+use super::types::{SocketHandle, WorkerInstructions, Message};
 
 
 #[derive(Debug)]

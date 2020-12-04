@@ -52,3 +52,12 @@ pub(crate) enum WorkerInstructions {
     AddSocket(SocketHandle, Socket),
     Terminate,
 }
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum NetworkDelivery {
+    UnreliableUnordered,
+    UnreliableSequenced(Option<u8>),
+    ReliableUnordered,
+    ReliableSequenced(Option<u8>),
+    ReliableOrdered(Option<u8>),
+}
