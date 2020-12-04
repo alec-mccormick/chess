@@ -1,20 +1,27 @@
 use bevy::prelude::*;
 // use bevy_prototype_networking_laminar::{NetworkingPlugin, NetworkResource};
 
+use std::net::SocketAddr;
 use log::{info};
 
 
 
-use chess::core::{CorePlugin};
+use chess::core::{CorePlugin, ServerBindAddr};
 
 use chess::render::RenderPlugin;
 use chess::ui::UIPlugin;
 
-
+const SERVER: &str = "127.0.0.1:12351";
+const CLIENT: &str = "127.0.0.1:12350";
 
 
 fn main() {
     env_logger::init();
+
+    let addr: SocketAddr = SERVER
+        .parse()
+        .expect("Unable to parse socket address");
+
 
     App::build()
         .add_resource(WindowDescriptor {
@@ -25,9 +32,9 @@ fn main() {
             resizable: false,
             ..Default::default()
         })
-        .add_system_to_stage(stage::FIRST, print_frame.system())
+        // .add_system_to_stage(stage::FIRST, print_frame.system())
         .add_plugins(DefaultPlugins)
-        // .add_plugin(NetworkingPlugin)
+        .add_resource(ServerBindAddr(addr))
         .add_plugin(CorePlugin)
         .add_plugin(UIPlugin)
         .add_plugin(RenderPlugin)

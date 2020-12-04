@@ -18,6 +18,8 @@ To run in debug mode:
 - [x] Add robust logging
 - [x] Update rendering to isometric
 - [ ] Add Networking
+    - [ ] Serialize/deserialize board
+    - [ ] Serialize/deserialize messages 
 - [ ] Migrate to using SpriteConfig
 - [ ] Add Bot AI
 - [ ] Show movable squares on hover

@@ -7,6 +7,7 @@ use std::collections::HashMap;
 pub struct TileComponents {
     pub tile: Tile,
     pub position: Position,
+    pub labels: Labels,
 }
 
 #[derive(Debug)]

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use log::{debug, info};
 
 use crate::prelude::*;
-use crate::core::{Team, CreateGameEvent};
+use crate::core::{Team, CreateGameEvent, PlayerInfo};
 
 
 
@@ -23,6 +23,7 @@ pub struct JoinButton;
 // ==========================================================================
 struct MainMenuSpawner {
     start_button: MainMenuButtonSpawner,
+    join_button: MainMenuButtonSpawner,
 }
 
 impl EntitySpawner for MainMenuSpawner {
@@ -33,6 +34,9 @@ impl EntitySpawner for MainMenuSpawner {
             .with_children(|commands| {
                 self.start_button.spawn_as_child(commands)
                     .with(StartButton);
+
+                self.join_button.spawn_as_child(commands)
+                    .with(JoinButton);
             })
     }
 }
@@ -40,13 +44,15 @@ impl EntitySpawner for MainMenuSpawner {
 impl MainMenuSpawner {
     fn new(materials: &Res<MainMenuMaterials>) -> Self {
         Self {
-            start_button: MainMenuButtonSpawner::new(materials, "Start"),
+            start_button: MainMenuButtonSpawner::from_materials(materials, "Start"),
+            join_button: MainMenuButtonSpawner::from_materials(materials, "Join"),
         }
     }
 
     fn node_components() -> NodeComponents {
         NodeComponents {
             style: Style {
+                size: Size::new(Val::Percent(50.0), Val::Percent(50.0)),
                 flex_direction: FlexDirection::Column,
                 align_content: AlignContent::Center,
                 justify_content: JustifyContent::Center,
@@ -81,7 +87,7 @@ impl ChildEntitySpawner for MainMenuButtonSpawner {
 }
 
 impl MainMenuButtonSpawner {
-    fn new(materials: &Res<MainMenuMaterials>, text: &'static str) -> Self {
+    fn from_materials(materials: &Res<MainMenuMaterials>, text: &'static str) -> Self {
         let material = materials.normal.as_weak();
         let font = materials.font.as_weak();
 
@@ -130,7 +136,6 @@ pub fn handle_create_main_menu_event(
 ) {
     for _ in reader.iter(&events) {
         info!("handle_create_main_menu_event()");
-
         MainMenuSpawner::new(&main_menu_materials).spawn(&mut commands);
     }
 }
@@ -174,8 +179,10 @@ pub fn handle_start_button_pressed(
     }
 
     create_game_events.send(CreateGameEvent {
-        player_name: "Player 1".into(),
-        team: Team::White,
+        player_info: PlayerInfo {
+            name: "Player 1".into(),
+            team: Team::White,
+        }
     });
 }
 

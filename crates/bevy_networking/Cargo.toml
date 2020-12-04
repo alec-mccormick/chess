@@ -1,6 +1,6 @@
 [package]
 name = "bevy_networking"
-version = "0.1.0"
+version = "0.3.0"
 authors = ["alec-mccormick <alec.s.mccormick@gmail.com>"]
 edition = "2018"
 

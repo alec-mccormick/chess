@@ -24,7 +24,7 @@ impl Plugin for NetworkingPlugin {
         app
             .add_event::<NetworkEvent>()
             .add_resource(network_resource)
-            .add_system(process_network_events.system());
+            .add_system_to_stage(bevy::prelude::stage::EVENT,process_network_events.system());
     }
 }
 

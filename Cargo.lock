@@ -501,6 +501,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_networking"
+version = "0.3.0"
+dependencies = [
+ "bevy",
+ "bytes",
+ "crossbeam-channel",
+ "laminar",
+ "uuid",
+]
+
+[[package]]
 name = "bevy_pbr"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -832,6 +843,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 
 [[package]]
+name = "build_const"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39092a32794787acd8525ee150305ff051b0aa6cc2abaf193924f5ab05425f39"
+
+[[package]]
 name = "bumpalo"
 version = "3.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -902,6 +919,7 @@ name = "chess"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_networking",
  "bevy_prototype_lyon",
  "derive_more",
  "env_logger 0.8.2",
@@ -1171,6 +1189,15 @@ dependencies = [
  "thiserror",
  "web-sys",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "crc"
+version = "1.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d663548de7f5cca343f1e0a48d14dcfb0e9eb4e079ec58883b7251539fa10aeb"
+dependencies = [
+ "build_const",
 ]
 
 [[package]]
@@ -2062,6 +2089,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "laminar"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0065119db26bdc6a123618300f920dfe93102852bed5c0a5f9e265b231f03859"
+dependencies = [
+ "byteorder",
+ "crc",
+ "crossbeam-channel",
+ "lazy_static",
+ "log",
+ "rand",
+ "rand_pcg",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2803,6 +2845,15 @@ name = "rand_hc"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ca3129af7b92a17112d59ad498c6f81eaf463253766b90396d39ea7a39d6613c"
+dependencies = [
+ "rand_core",
+]
+
+[[package]]
+name = "rand_pcg"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16abd0c1b639e9eb4d7c50c0b8100b0d0f849be2349829c740fe8e6eb4816429"
 dependencies = [
  "rand_core",
 ]
