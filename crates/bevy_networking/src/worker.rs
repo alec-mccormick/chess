@@ -47,7 +47,7 @@ pub fn start_worker_thread() -> NetworkResource {
             );
         }
 
-        start = std::time::Instant::now();
+        start = Instant::now();
 
         let should_terminate = handle_instructions(&mut sockets, &instruction_rx);
         if should_terminate {
@@ -57,7 +57,7 @@ pub fn start_worker_thread() -> NetworkResource {
         send_messages(&mut sockets, &message_rx, &mut event_tx);
         receive_messages(&mut sockets, &mut event_tx);
 
-        end = std::time::Instant::now();
+        end = Instant::now();
 
         // go dark
         std::thread::sleep(sleep_time);
@@ -120,10 +120,13 @@ fn receive_messages(sockets: &mut TrackedSockets, event_tx: &mut Sender<NetworkE
     for (socket_handle, socket) in sockets.iter_mut() {
         while let Some(event) = socket.recv() {
             let e = match event {
-                SocketEvent::Connect(addr) => Some(NetworkEvent::Connected(Connection {
-                    addr,
-                    socket: *socket_handle,
-                })),
+                SocketEvent::Connect(addr) => {
+                    println!("!!! SOCKET CONNECT EVENT");
+                    Some(NetworkEvent::Connected(Connection {
+                        addr,
+                        socket: *socket_handle,
+                    }))
+                },
                 SocketEvent::Timeout(addr) => Some(NetworkEvent::Disconnected(Connection {
                     addr,
                     socket: *socket_handle,
@@ -135,10 +138,14 @@ fn receive_messages(sockets: &mut TrackedSockets, event_tx: &mut Sender<NetworkE
                     },
                     Bytes::copy_from_slice(packet.payload()),
                 )),
-                SocketEvent::Disconnect(addr) => Some(NetworkEvent::Disconnected(Connection {
-                    addr,
-                    socket: *socket_handle,
-                })),
+                SocketEvent::Disconnect(addr) => {
+                    println!("!!! SOCKET DISCONNECT EVENT");
+
+                    Some(NetworkEvent::Disconnected(Connection {
+                        addr,
+                        socket: *socket_handle,
+                    }))
+                },
             };
 
             if let Some(e) = e {

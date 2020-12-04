@@ -9,8 +9,7 @@ use std::{
 use super::{
     error::NetworkError,
     events::NetworkEvent,
-    types::{Connection, SendConfig, SocketHandle, Message, WorkerInstructions, NetworkDelivery},
-    transport::{LaminarConfig, Transport},
+    types::{Connection, SendConfig, SocketHandle, Message, WorkerInstructions, NetworkDelivery, LaminarConfig, Transport},
 };
 
 

@@ -7,7 +7,6 @@ mod error;
 mod resources;
 mod events;
 mod worker;
-mod transport;
 
 
 pub use error::NetworkError;
