@@ -1,12 +1,12 @@
-use crate::core::unit::{Action, UnitCmd, UnitStore, Unit, Team, Health, Actions, ActionResult, UnitComponents};
-use crate::prelude::*;
+use crate::{
+    core::unit::{Action, ActionResult, Actions, Health, Team, Unit, UnitCmd, UnitComponents, UnitStore},
+    prelude::*,
+};
 use bevy::prelude::*;
 
-use std::vec;
-use std::ops::Add;
+use std::{ops::Add, vec};
 
 use super::utils::move_unit;
-
 
 
 pub fn pawn() -> UnitComponents {
@@ -20,8 +20,6 @@ pub fn pawn() -> UnitComponents {
 }
 
 
-
-
 pub struct PawnMoveAction;
 
 impl Action for PawnMoveAction {
@@ -29,15 +27,14 @@ impl Action for PawnMoveAction {
         &self,
         entity: &Entity,
         store: &Res<UnitStore>,
-        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
+        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
     ) -> Box<dyn Iterator<Item = Position>> {
-
         let position = query.get_component::<Position>(*entity).unwrap();
         let team = query.get_component::<Team>(*entity).unwrap();
 
         let (step, home_row) = match team {
             Team::White => (1, 1),
-            Team::Black => (-1, 6)
+            Team::Black => (-1, 6),
         };
 
         let mut results: Vec<Position> = vec![];
@@ -86,7 +83,7 @@ impl Action for PawnMoveAction {
         entity: &Entity,
         target: &Position,
         store: &Res<UnitStore>,
-        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
+        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
     ) -> Box<dyn Iterator<Item = ActionResult>> {
         Box::new(move_unit(entity, target, store, query))
     }

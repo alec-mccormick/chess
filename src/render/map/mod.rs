@@ -1,13 +1,15 @@
-use bevy::{prelude::*, ecs::Command, render::camera::Camera};
-use std::{ops::Deref, cmp::max};
+use bevy::{ecs::Command, prelude::*, render::camera::Camera};
 use log::{debug, trace};
 use lyon::math::Point;
+use std::{cmp::max, ops::Deref};
 
 use bevy_prototype_lyon::prelude::*;
 
-use crate::prelude::*;
-use crate::core::map::{Map, Tile};
-use super::utils::{self, HALF_TILE_RENDER_WIDTH_PX, HALF_TILE_RENDER_HEIGHT_PX};
+use super::utils::{self, HALF_TILE_RENDER_HEIGHT_PX, HALF_TILE_RENDER_WIDTH_PX};
+use crate::{
+    core::map::{Map, Tile},
+    prelude::*,
+};
 
 
 /// ==========================================================================
@@ -17,12 +19,10 @@ pub struct RenderMapPlugin;
 
 impl Plugin for RenderMapPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app
-            .init_resource::<TileMaterials>()
+        app.init_resource::<TileMaterials>()
             .add_system(handle_map_spawned.system())
             .add_system(handle_tile_spawned.system())
-            .add_system_to_stage(stage::UPDATE, TileOverlay::handle_state_changed.system())
-        ;
+            .add_system_to_stage(stage::UPDATE, TileOverlay::handle_state_changed.system());
     }
 }
 
@@ -32,20 +32,24 @@ pub struct GameCamera;
 /// ==========================================================================
 /// Map Rendering
 /// ==========================================================================
-pub fn handle_map_spawned(
-    mut commands: Commands,
-    query: Query<(Entity, &Dimensions, Added<Map>)>,
-) {
+pub fn handle_map_spawned(mut commands: Commands, query: Query<(Entity, &Dimensions, Added<Map>)>) {
     for (entity, dimensions, _map) in query.iter() {
         debug!("handle_map_spawned() - Insert Mesh components for rendering");
 
         let scale = Vec3::splat(2.5);
         let translation = utils::convert_dimensions_to_map_offset(dimensions) * scale;
 
-        commands.insert(entity, MeshComponents {
-            transform: Transform { translation, scale, ..Default::default() },
-            ..Default::default()
-        });
+        commands.insert(
+            entity,
+            MeshComponents {
+                transform: Transform {
+                    translation,
+                    scale,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        );
     }
 }
 
@@ -74,7 +78,7 @@ fn handle_tile_spawned(
             .spawn(SpriteComponents {
                 material,
                 transform: Transform {
-                    translation: Vec3::new(0.0, -16.0, 0.0),    // offset sprite 16 px down
+                    translation: Vec3::new(0.0, -16.0, 0.0), // offset sprite 16 px down
                     ..Default::default()
                 },
                 ..Default::default()
@@ -82,7 +86,6 @@ fn handle_tile_spawned(
             .with(Parent(entity));
     }
 }
-
 
 
 /// ==========================================================================
@@ -98,7 +101,6 @@ pub enum TileOverlayState {
 }
 
 impl TileOverlay {
-
     fn spawn(
         commands: &mut Commands,
         meshes: &mut ResMut<Assets<Mesh>>,
@@ -115,7 +117,7 @@ impl TileOverlay {
                     Point::new(-HALF_TILE_RENDER_WIDTH_PX as f32, 0.0),
                     Point::new(0.0, HALF_TILE_RENDER_HEIGHT_PX as f32),
                     Point::new(HALF_TILE_RENDER_WIDTH_PX as f32, 0.0),
-                    Point::new(0.0, -HALF_TILE_RENDER_HEIGHT_PX as f32)
+                    Point::new(0.0, -HALF_TILE_RENDER_HEIGHT_PX as f32),
                 ),
                 TessellationMode::Fill(&FillOptions::default()),
                 Vec3::new(0.0, 0.0, 0.1),
@@ -127,7 +129,7 @@ impl TileOverlay {
     fn handle_state_changed(
         tile_materials: Res<TileMaterials>,
         tile_query: Query<With<Tile, (Changed<TileOverlayState>, &Children)>>,
-        mut overlay_query: Query<With<TileOverlay, &mut Handle<ColorMaterial>>>
+        mut overlay_query: Query<With<TileOverlay, &mut Handle<ColorMaterial>>>,
     ) {
         for (tile_overlay_state, children) in tile_query.iter() {
             debug!("TileOverlay::handle_tile_overlay_changed() {:?}", *tile_overlay_state);
@@ -136,7 +138,7 @@ impl TileOverlay {
                 if let Ok(mut material) = overlay_query.get_mut(*child) {
                     *material = match *tile_overlay_state {
                         TileOverlayState::Invisible => tile_materials.invisible.clone(),
-                        TileOverlayState::Visible => tile_materials.hover_overlay.clone()
+                        TileOverlayState::Visible => tile_materials.hover_overlay.clone(),
                     };
                 }
             }
@@ -153,14 +155,14 @@ pub struct TileMaterials {
     white: Handle<ColorMaterial>,
     black: Handle<ColorMaterial>,
     pub hover_overlay: Handle<ColorMaterial>,
-    pub invisible: Handle<ColorMaterial>
+    pub invisible: Handle<ColorMaterial>,
 }
 
 impl TileMaterials {
-    pub(crate) fn get_material(&self, tile: impl Deref<Target=Tile>) -> Handle<ColorMaterial> {
+    pub(crate) fn get_material(&self, tile: impl Deref<Target = Tile>) -> Handle<ColorMaterial> {
         match tile.deref() {
             Tile::White => self.white.clone(),
-            Tile::Black => self.black.clone()
+            Tile::Black => self.black.clone(),
         }
     }
 }
@@ -174,7 +176,7 @@ impl FromResources for TileMaterials {
             white: materials.add(asset_server.load("textures/ground_0.png").into()),
             black: materials.add(asset_server.load("textures/ground_burnt.png").into()),
             hover_overlay: materials.add(Color::rgba(0.0, 1.0, 0.0, 0.15).into()),
-            invisible: materials.add(Color::rgba(0.0, 0.0, 0.0, 0.0).into())
+            invisible: materials.add(Color::rgba(0.0, 0.0, 0.0, 0.0).into()),
         }
     }
 }

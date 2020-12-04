@@ -1,10 +1,9 @@
 use crate::prelude::*;
 use bevy::prelude::*;
 
-use crate::core::unit::{Action, UnitCmd, UnitStore, Unit, Team, Health, Actions, ActionResult};
+use crate::core::unit::{Action, ActionResult, Actions, Health, Team, Unit, UnitCmd, UnitStore};
 
-use std::vec;
-use std::ops::Add;
+use std::{ops::Add, vec};
 
 pub fn list_targets_step(
     starting_position: &Position,
@@ -42,11 +41,9 @@ pub fn move_unit(
     entity: &Entity,
     target: &Position,
     store: &Res<UnitStore>,
-    query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
+    query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
 ) -> vec::IntoIter<ActionResult> {
-    let mut commands: Vec<ActionResult> = vec![
-        ActionResult::SetPosition(*entity, *target)
-    ];
+    let mut commands: Vec<ActionResult> = vec![ActionResult::SetPosition(*entity, *target)];
 
     if let Some(target_unit) = store.get_unit(target) {
         let team = query.get_component::<Team>(*entity).unwrap();

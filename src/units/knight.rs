@@ -1,9 +1,10 @@
-use crate::core::unit::{Action, UnitCmd, UnitStore, Unit, Team, Health, Actions, ActionResult, UnitComponents};
-use crate::prelude::*;
+use crate::{
+    core::unit::{Action, ActionResult, Actions, Health, Team, Unit, UnitCmd, UnitComponents, UnitStore},
+    prelude::*,
+};
 use bevy::prelude::*;
 
-use std::vec;
-use std::ops::Add;
+use std::{ops::Add, vec};
 
 use super::utils::{list_targets_step, move_unit};
 
@@ -26,8 +27,8 @@ impl Action for KnightMoveAction {
         &self,
         entity: &Entity,
         store: &Res<UnitStore>,
-        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
-    ) -> Box<dyn Iterator<Item=Position>> {
+        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
+    ) -> Box<dyn Iterator<Item = Position>> {
         let position = query.get_component::<Position>(*entity).unwrap();
         let team = query.get_component::<Team>(*entity).unwrap();
 
@@ -39,23 +40,26 @@ impl Action for KnightMoveAction {
             Position::new(2, -1),
             Position::new(1, -2),
             Position::new(-1, -2),
-            Position::new(-2, -1)
+            Position::new(-2, -1),
         ];
 
-        let results = steps.into_iter().filter(|step| {
-            let next = position.add(*step);
+        let results = steps
+            .into_iter()
+            .filter(|step| {
+                let next = position.add(*step);
 
-            if next.x < 0 || next.y < 0 || next.x > 7 || next.y > 7 {
-                return false;
-            }
+                if next.x < 0 || next.y < 0 || next.x > 7 || next.y > 7 {
+                    return false;
+                }
 
-            if let Some(unit_entity) = store.get_unit(&next) {
-                let target_team = query.get_component::<Team>(*unit_entity).unwrap();
-                return target_team != team;
-            }
+                if let Some(unit_entity) = store.get_unit(&next) {
+                    let target_team = query.get_component::<Team>(*unit_entity).unwrap();
+                    return target_team != team;
+                }
 
-            true
-        }).collect::<Vec<Position>>();
+                true
+            })
+            .collect::<Vec<Position>>();
 
         Box::new(results.into_iter())
     }
@@ -65,8 +69,8 @@ impl Action for KnightMoveAction {
         entity: &Entity,
         target: &Position,
         store: &Res<UnitStore>,
-        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
-    ) -> Box<dyn Iterator<Item=ActionResult>> {
+        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
+    ) -> Box<dyn Iterator<Item = ActionResult>> {
         Box::new(move_unit(entity, target, store, query))
     }
 }

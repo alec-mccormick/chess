@@ -1,10 +1,10 @@
-use log::{debug};
+use log::debug;
 
-use std::collections::{HashMap};
 use bevy::prelude::*;
+use std::collections::HashMap;
 
-use crate::prelude::*;
 use super::components::*;
+use crate::prelude::*;
 
 
 /// UnitStorage
@@ -17,7 +17,6 @@ pub struct UnitStore {
 
 
 impl UnitStore {
-
     pub fn set_position(&mut self, unit_id: Entity, position: Position) {
         self.remove_position_inner(unit_id);
 
@@ -51,12 +50,10 @@ impl UnitStore {
 }
 
 
-
 impl UnitStore {
-
     pub fn handle_position_changed(
         mut store: ResMut<UnitStore>,
-        query: Query<With<Unit, (Entity, Changed<Position>)>>
+        query: Query<With<Unit, (Entity, Changed<Position>)>>,
     ) {
         for (entity, position) in query.iter() {
             debug!("handle_position_changed() {:?} {:?}", entity, *position);
@@ -67,7 +64,7 @@ impl UnitStore {
     pub fn handle_health_changed(
         mut commands: Commands,
         mut store: ResMut<UnitStore>,
-        query: Query<With<Unit, (Entity, Mutated<Health>)>>
+        query: Query<With<Unit, (Entity, Mutated<Health>)>>,
     ) {
         for (entity, health) in query.iter() {
             debug!("handle_health_changed() {:?} {:?}", entity, *health);

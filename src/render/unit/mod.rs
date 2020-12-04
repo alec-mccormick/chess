@@ -1,7 +1,7 @@
-use bevy::{prelude::*, ecs::Command};
 use crate::prelude::*;
+use bevy::{ecs::Command, prelude::*};
 
-use crate::core::unit::{Unit, Team};
+use crate::core::unit::{Team, Unit};
 
 use super::utils;
 
@@ -12,10 +12,8 @@ pub struct RenderUnitPlugin;
 
 impl Plugin for RenderUnitPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app
-            .init_resource::<UnitMaterials>()
-            .add_system(handle_unit_spawned.system())
-        ;
+        app.init_resource::<UnitMaterials>()
+            .add_system(handle_unit_spawned.system());
     }
 }
 
@@ -31,7 +29,13 @@ fn handle_unit_spawned(
         let material = materials.get_unit_material(&*unit, team);
 
         commands
-            .insert(entity, SpriteComponents { material, ..Default::default() })
+            .insert(
+                entity,
+                SpriteComponents {
+                    material,
+                    ..Default::default()
+                },
+            )
             .insert_one(entity, TransformOffset(Vec3::new(0.0, 16.0, 2.0)));
     }
 }

@@ -1,17 +1,22 @@
-use bevy::prelude::*;
 use crate::prelude::*;
-use bevy::ecs::Command;
+use bevy::{ecs::Command, prelude::*};
 use bevy_prototype_lyon::prelude::*;
 
 
-use crate::core::{Tile, Map, map::TileStore, unit::{Actions, Unit, Team, Health, UnitStore}};
-use log::{info};
+use crate::core::{
+    map::TileStore,
+    unit::{Actions, Health, Team, Unit, UnitStore},
+    Map, Tile,
+};
+use log::info;
 use std::cmp::Ordering;
 
 use std::collections::BTreeSet;
 
-use crate::render::utils::HALF_TILE_RENDER_WIDTH_PX;
-use crate::render::map::{TileMaterials, TileOverlayState};
+use crate::render::{
+    map::{TileMaterials, TileOverlayState},
+    utils::HALF_TILE_RENDER_WIDTH_PX,
+};
 
 use super::input::InputState;
 use std::ops::Deref;
@@ -28,7 +33,10 @@ pub fn handle_input_state_change(
     mut tile_query: Query<(&Tile, &mut TileOverlayState)>,
     action_query: Query<(&Unit, &Position, &Team, &Health, &Actions)>,
 ) {
-    info!("handle_input_state_change() {:?}, previous: {:?}", *input_state, *previous_state);
+    info!(
+        "handle_input_state_change() {:?}, previous: {:?}",
+        *input_state, *previous_state
+    );
 
     match *input_state {
         InputState::UnitSelected(entity) => {

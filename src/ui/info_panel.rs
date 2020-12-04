@@ -1,8 +1,9 @@
-
+use crate::{
+    core::{unit::Team, CreateGameEvent, GameState},
+    prelude::*,
+};
 use bevy::prelude::*;
-use log::{debug};
-use crate::prelude::*;
-use crate::core::{GameState, unit::Team, CreateGameEvent};
+use log::debug;
 
 pub struct InfoPanelPlugin;
 impl Plugin for InfoPanelPlugin {
@@ -10,8 +11,7 @@ impl Plugin for InfoPanelPlugin {
         app
             // .add_startup_system(setup.system())
             .add_system(handle_create_game_event.system())
-            .add_system(ActivePlayerView::handle_game_state_changed.system())
-        ;
+            .add_system(ActivePlayerView::handle_game_state_changed.system());
     }
 }
 
@@ -37,12 +37,10 @@ fn handle_create_game_event(
                     text: text("Active Player:".into(), font.clone()),
                     ..Default::default()
                 })
-                .with(ActivePlayerView)
-            ;
+                .with(ActivePlayerView);
         });
     }
 }
-
 
 
 struct InfoPanelView;
@@ -69,10 +67,7 @@ impl InfoPanelView {
 
 struct ActivePlayerView;
 impl ActivePlayerView {
-    fn handle_game_state_changed(
-        state: ChangedRes<GameState>,
-        mut query: Query<With<ActivePlayerView, &mut Text>>
-    ) {
+    fn handle_game_state_changed(state: ChangedRes<GameState>, mut query: Query<With<ActivePlayerView, &mut Text>>) {
         println!("Handle game state changed!!!");
 
         for mut text in query.iter_mut() {
@@ -81,7 +76,6 @@ impl ActivePlayerView {
         }
     }
 }
-
 
 
 // ==============================================================================

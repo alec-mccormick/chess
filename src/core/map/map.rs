@@ -1,5 +1,5 @@
-use bevy::prelude::*;
 use crate::prelude::*;
+use bevy::prelude::*;
 
 use super::tile::*;
 
@@ -20,4 +20,3 @@ impl Default for MapComponents {
 
 #[derive(Debug)]
 pub struct Map;
-

@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 use log::{debug, info};
 
-use crate::prelude::*;
-use crate::core::{Team, CreateGameEvent, PlayerInfo};
-
+use crate::{
+    core::{CreateGameEvent, PlayerInfo, Team},
+    prelude::*,
+};
 
 
 pub struct CreateMainMenuEvent;
@@ -32,11 +33,9 @@ impl EntitySpawner for MainMenuSpawner {
             .spawn(Self::node_components())
             .with(MainMenu)
             .with_children(|commands| {
-                self.start_button.spawn_as_child(commands)
-                    .with(StartButton);
+                self.start_button.spawn_as_child(commands).with(StartButton);
 
-                self.join_button.spawn_as_child(commands)
-                    .with(JoinButton);
+                self.join_button.spawn_as_child(commands).with(JoinButton);
             })
     }
 }
@@ -75,7 +74,6 @@ struct MainMenuButtonSpawner {
 }
 
 impl ChildEntitySpawner for MainMenuButtonSpawner {
-
     fn spawn_as_child<'a, 'b>(&self, commands: &'a mut ChildBuilder<'b>) -> &'a mut ChildBuilder<'b> {
         commands
             .spawn(self.button_components())
@@ -141,7 +139,6 @@ pub fn handle_create_main_menu_event(
 }
 
 
-
 /// Handles button interaction changes & updates the button material
 /// to reflect its interaction state.
 pub fn handle_main_menu_button_interaction(
@@ -164,7 +161,8 @@ pub fn handle_start_button_pressed(
     main_menu_query: Query<With<MainMenu, Entity>>,
     interaction_query: Query<With<StartButton, Mutated<Interaction>>>,
 ) {
-    let clicks = interaction_query.iter()
+    let clicks = interaction_query
+        .iter()
         .filter(|interaction| **interaction == Interaction::Clicked)
         .next();
 
@@ -182,7 +180,7 @@ pub fn handle_start_button_pressed(
         player_info: PlayerInfo {
             name: "Player 1".into(),
             team: Team::White,
-        }
+        },
     });
 }
 
@@ -193,7 +191,7 @@ pub struct MainMenuMaterials {
     normal: Handle<ColorMaterial>,
     hovered: Handle<ColorMaterial>,
     pressed: Handle<ColorMaterial>,
-    font: Handle<Font>
+    font: Handle<Font>,
 }
 
 impl FromResources for MainMenuMaterials {

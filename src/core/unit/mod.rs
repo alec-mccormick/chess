@@ -4,26 +4,24 @@ mod store;
 pub use components::*;
 pub use store::*;
 
-use bevy::prelude::*;
 use crate::prelude::*;
+use bevy::prelude::*;
 use std::ops::Deref;
 
-use log::{debug};
+use log::debug;
 
 
 pub struct UnitPlugin;
 
 impl Plugin for UnitPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app
-            .add_event::<UnitCmd>()
+        app.add_event::<UnitCmd>()
             .add_event::<ActionResult>()
             .add_resource(UnitStore::default())
             .add_system(handle_action_result.system())
             .add_system(handle_unit_cmd_system.system())
             .add_system(UnitStore::handle_position_changed.system())
-            .add_system(UnitStore::handle_health_changed.system())
-        ;
+            .add_system(UnitStore::handle_health_changed.system());
     }
 }
 
@@ -66,7 +64,7 @@ fn handle_action_result(
         match result {
             ActionResult::SetPosition(entity, position) => {
                 query.set(*entity, *position).unwrap();
-            },
+            }
             ActionResult::SetHealth(entity, health) => {
                 query.set(*entity, *health).unwrap();
             }

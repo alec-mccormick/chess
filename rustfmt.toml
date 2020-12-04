@@ -1,5 +1,11 @@
 #unstable_features = true
-#merge_imports = true
-#use_field_init_shorthand = true
-#reorder_impl_items = true
-#newline_style = "Unix"
+merge_imports = true
+use_field_init_shorthand = true
+use_try_shorthand = true
+reorder_impl_items = true
+newline_style = "Unix"
+group_imports = "StdExternalCrate"
+empty_item_single_line = false
+blank_lines_lower_bound = 0
+blank_lines_upper_bound = 2
+max_width = 120

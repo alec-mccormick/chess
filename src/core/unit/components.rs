@@ -1,9 +1,8 @@
-use derive_more::{From, Into, Deref};
-use bevy::prelude::*;
 use crate::prelude::*;
+use bevy::prelude::*;
+use derive_more::{Deref, From, Into};
 
-use super::store::{UnitStore};
-
+use super::store::UnitStore;
 
 
 #[derive(Bundle)]
@@ -16,7 +15,6 @@ pub struct UnitComponents {
 }
 
 
-
 // ==============================================================================
 // --- Components
 // ==============================================================================
@@ -27,7 +25,7 @@ pub enum Unit {
     Knight,
     Rook,
     King,
-    Queen
+    Queen,
 }
 
 impl ToString for Unit {
@@ -38,7 +36,7 @@ impl ToString for Unit {
             Unit::Rook => "Rook".into(),
             Unit::Queen => "Queen".into(),
             Unit::Knight => "Knight".into(),
-            Unit::King => "King".into()
+            Unit::King => "King".into(),
         }
     }
 }
@@ -46,14 +44,14 @@ impl ToString for Unit {
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Team {
     White,
-    Black
+    Black,
 }
 
 impl ToString for Team {
     fn to_string(&self) -> String {
         match self {
             Team::White => "White".into(),
-            Team::Black => "Black".into()
+            Team::Black => "Black".into(),
         }
     }
 }
@@ -63,28 +61,21 @@ impl ToString for Team {
 pub struct Health(pub u32);
 
 
-
-
-
-
-
-type ActionError = String;  // TODO
+type ActionError = String; // TODO
 #[derive(From, Into, Deref)]
 pub struct Actions(pub Vec<Box<dyn Action + Send + Sync>>);
 impl Actions {
-
     pub fn get(&self, index: usize) -> Result<&Box<dyn Action + Send + Sync>, ActionError> {
         self.0.get(index).ok_or(String::from("Error"))
     }
 }
 
 pub trait Action {
-
     fn list_targets(
         &self,
         entity: &Entity,
         store: &Res<UnitStore>,
-        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
+        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
     ) -> Box<dyn Iterator<Item = Position>>;
 
     fn execute(
@@ -92,7 +83,7 @@ pub trait Action {
         entity: &Entity,
         target: &Position,
         store: &Res<UnitStore>,
-        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
+        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
     ) -> Box<dyn Iterator<Item = ActionResult>>;
 }
 
@@ -102,17 +93,15 @@ pub fn is_action_valid(
     entity: &Entity,
     target: &Position,
     store: &Res<UnitStore>,
-    query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
+    query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
 ) -> bool {
-    action
-        .list_targets(entity, store, query)
-        .any(|p| p == *target)
+    action.list_targets(entity, store, query).any(|p| p == *target)
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum ActionResult {
     SetPosition(Entity, Position),
-    SetHealth(Entity, Health)
+    SetHealth(Entity, Health),
 }
 
 
@@ -120,7 +109,5 @@ pub enum ActionResult {
 ///
 #[derive(Debug, Copy, Clone)]
 pub enum UnitCmd {
-    ExecuteAction(Entity, usize, Position)
+    ExecuteAction(Entity, usize, Position),
 }
-
-

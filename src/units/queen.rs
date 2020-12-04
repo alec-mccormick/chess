@@ -1,9 +1,10 @@
-use crate::core::unit::{Action, UnitCmd, UnitStore, Unit, Team, Health, Actions, ActionResult, UnitComponents};
-use crate::prelude::*;
+use crate::{
+    core::unit::{Action, ActionResult, Actions, Health, Team, Unit, UnitCmd, UnitComponents, UnitStore},
+    prelude::*,
+};
 use bevy::prelude::*;
 
-use std::vec;
-use std::ops::Add;
+use std::{ops::Add, vec};
 
 use super::utils::{list_targets_step, move_unit};
 
@@ -26,8 +27,8 @@ impl Action for QueenMoveAction {
         &self,
         entity: &Entity,
         store: &Res<UnitStore>,
-        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
-    ) -> Box<dyn Iterator<Item=Position>> {
+        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
+    ) -> Box<dyn Iterator<Item = Position>> {
         let position = query.get_component::<Position>(*entity).unwrap();
         let team = query.get_component::<Team>(*entity).unwrap();
 
@@ -39,12 +40,13 @@ impl Action for QueenMoveAction {
             Position::new(1, -1),
             Position::new(1, 1),
             Position::new(-1, -1),
-            Position::new(-1, 1)
+            Position::new(-1, 1),
         ];
 
-        let results = steps.into_iter().flat_map(|step| {
-            list_targets_step(position, team, step, store, query)
-        }).collect::<Vec<Position>>();
+        let results = steps
+            .into_iter()
+            .flat_map(|step| list_targets_step(position, team, step, store, query))
+            .collect::<Vec<Position>>();
 
         Box::new(results.into_iter())
     }
@@ -54,8 +56,8 @@ impl Action for QueenMoveAction {
         entity: &Entity,
         target: &Position,
         store: &Res<UnitStore>,
-        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>
-    ) -> Box<dyn Iterator<Item=ActionResult>> {
+        query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
+    ) -> Box<dyn Iterator<Item = ActionResult>> {
         Box::new(move_unit(entity, target, store, query))
     }
 }

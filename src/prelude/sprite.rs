@@ -1,7 +1,3 @@
-
-
-
-
 pub struct SpriteConfig {
-    pub src: String
+    pub src: String,
 }

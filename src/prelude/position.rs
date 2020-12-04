@@ -17,7 +17,10 @@ impl Add for Position {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
-        Self { x: self.x + other.x, y: self.y + other.y }
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
     }
 }
 

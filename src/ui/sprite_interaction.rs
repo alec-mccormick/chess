@@ -1,10 +1,12 @@
-use bevy::prelude::*;
 use crate::prelude::*;
+use bevy::prelude::*;
 
-use log::{trace};
+use log::trace;
 
-use crate::core::Tile;
-use crate::render::utils::{HALF_TILE_RENDER_WIDTH_PX, HALF_TILE_RENDER_HEIGHT_PX};
+use crate::{
+    core::Tile,
+    render::utils::{HALF_TILE_RENDER_HEIGHT_PX, HALF_TILE_RENDER_WIDTH_PX},
+};
 
 
 #[derive(Default)]
@@ -21,7 +23,7 @@ pub fn sprite_interaction_system(
     cursor_moved_events: Res<Events<CursorMoved>>,
     touches_input: Res<Touches>,
     window: Res<WindowDescriptor>,
-    mut query: Query<(Entity, &Tile, &GlobalTransform, &mut Interaction)>
+    mut query: Query<(Entity, &Tile, &GlobalTransform, &mut Interaction)>,
 ) {
     let mut cursor_changed = false;
 
@@ -35,8 +37,7 @@ pub fn sprite_interaction_system(
         cursor_changed = true;
     }
 
-    let mouse_clicked = mouse_button_input.just_released(MouseButton::Left)
-        || touches_input.just_released(0);
+    let mouse_clicked = mouse_button_input.just_released(MouseButton::Left) || touches_input.just_released(0);
 
     if !cursor_changed && !mouse_clicked {
         return;
@@ -69,9 +70,7 @@ pub fn sprite_interaction_system(
 
     trace!("Potential hovered tiles length: {}", potential_tiles.len());
 
-    potential_tiles.sort_by(|(_, _, _, _, _, a), (_, _, _, _, _, b)| {
-        a.y().partial_cmp(&b.y()).unwrap()
-    });
+    potential_tiles.sort_by(|(_, _, _, _, _, a), (_, _, _, _, _, b)| a.y().partial_cmp(&b.y()).unwrap());
 
     let mut hovered_entity = None;
 

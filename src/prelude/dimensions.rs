@@ -1,6 +1,3 @@
-
-
-
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Dimensions {
     pub width: i32,
