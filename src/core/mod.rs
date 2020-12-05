@@ -1,18 +1,22 @@
 use bevy::prelude::*;
-use bevy_networking::{NetworkDelivery, NetworkEvent, NetworkResource, NetworkingPlugin};
+use bevy_networking::{NetworkDelivery, NetworkResource, NetworkingPlugin, events::MessageReceived};
 use log::{debug, info};
 use std::net::SocketAddr;
+use serde::{Serialize, Deserialize};
+
 
 use crate::{prelude::*, units::*};
 
 pub mod map;
 pub mod unit;
+mod game;
 
 pub use map::{Map, MapComponents, Tile, TileComponents};
 pub use unit::{Action, Actions, Health, Team, Unit, UnitCmd, UnitComponents};
 
 use map::MapPlugin;
 use unit::UnitPlugin;
+use game::GameDescriptor;
 
 
 const SERVER: &str = "127.0.0.1:12351";
@@ -25,7 +29,8 @@ const CLIENT: &str = "127.0.0.1:12350";
 pub struct CorePlugin;
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_plugin(NetworkingPlugin)
+        app
+            .add_plugin(NetworkingPlugin)
             .add_startup_system(init_networking.system())
             .add_event::<CreateGameEvent>()
             .add_event::<JoinGameEvent>()
@@ -56,6 +61,12 @@ pub struct JoinGameEvent {
     pub server_addr: SocketAddr,
 }
 
+#[derive(Debug, Clone)]
+pub struct PlayerInfo {
+    pub name: String,
+    pub team: Team,
+}
+
 
 struct Game;
 impl Game {
@@ -70,7 +81,7 @@ impl Game {
             debug!("handle_create_game_event() - create game: {:?}", event);
 
             state.player_info = event.player_info.clone();
-            GameSpawner::default().spawn(&mut commands);
+            GameDescriptor::default().spawn(&mut commands);
         }
     }
 
@@ -86,120 +97,8 @@ impl Game {
 
             state.connection_info = ConnectionInfo::Client(event.server_addr);
             state.player_info = event.player_info.clone();
-            GameSpawner::default().spawn(&mut commands);
+            GameDescriptor::default().spawn(&mut commands);
         }
-    }
-}
-
-/// ==========================================================================
-/// Game Spawner
-/// ==========================================================================
-#[derive(Default)]
-struct GameSpawner;
-
-impl EntitySpawner for GameSpawner {
-    fn spawn<'a>(&self, commands: &'a mut Commands) -> &'a mut Commands {
-        map::MapSpawner::default().spawn(commands).with_children(|commands| {
-            for x in 0..=7 {
-                commands.spawn(UnitComponents {
-                    team: Team::White,
-                    position: (x, 1).into(),
-                    ..pawn()
-                });
-                commands.spawn(UnitComponents {
-                    team: Team::Black,
-                    position: (x, 6).into(),
-                    ..pawn()
-                });
-            }
-
-            let team = Team::White;
-            commands.spawn(UnitComponents {
-                team,
-                position: (0, 0).into(),
-                ..rook()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (1, 0).into(),
-                ..knight()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (2, 0).into(),
-                ..bishop()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (3, 0).into(),
-                ..queen()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (4, 0).into(),
-                ..king()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (5, 0).into(),
-                ..bishop()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (6, 0).into(),
-                ..knight()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (7, 0).into(),
-                ..rook()
-            });
-
-
-            let team = Team::Black;
-            commands.spawn(UnitComponents {
-                team,
-                position: (0, 7).into(),
-                ..rook()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (1, 7).into(),
-                ..knight()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (2, 7).into(),
-                ..bishop()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (3, 7).into(),
-                ..queen()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (4, 7).into(),
-                ..king()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (5, 7).into(),
-                ..bishop()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (6, 7).into(),
-                ..knight()
-            });
-            commands.spawn(UnitComponents {
-                team,
-                position: (7, 7).into(),
-                ..rook()
-            });
-
-            debug!("handle_create_game_event() - Units Spawned");
-        })
     }
 }
 
@@ -213,12 +112,6 @@ pub enum GameStartingState {
 /// ==========================================================================
 /// Game State
 /// ==========================================================================
-#[derive(Debug, Clone)]
-pub struct PlayerInfo {
-    pub name: String,
-    pub team: Team,
-}
-
 #[derive(Debug, Clone)]
 pub struct GameState {
     pub player_info: PlayerInfo,
@@ -258,7 +151,7 @@ impl GameState {
         }
     }
 }
-
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum GameType {
     // Hotseat,
     Local,

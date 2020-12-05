@@ -1,5 +1,6 @@
 use crate::prelude::*;
 use bevy::prelude::*;
+use serde::{Serialize, Deserialize};
 
 mod map;
 mod tile;
@@ -26,24 +27,46 @@ impl Plugin for MapPlugin {
 // ==========================================================================
 // MapSpawner
 // ==========================================================================
-#[derive(Default)]
-pub struct MapSpawner;
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MapDescriptor {
+    dimensions: Dimensions,
+    tiles: Vec<(Tile, Position)>,
+}
 
+impl EntitySpawner for MapDescriptor {
+    fn spawn(self, commands: &mut Commands) -> &mut Commands {
+        let MapDescriptor { dimensions, tiles } = self;
 
-impl EntitySpawner for MapSpawner {
-    fn spawn<'a>(&self, commands: &'a mut Commands) -> &'a mut Commands {
-        commands.spawn(MapComponents::default()).with_children(|commands| {
-            for x in 0..=7 {
-                for y in 0..=7 {
-                    let position = Position::new(x, y);
-                    let tile = if (x + y) % 2 == 0 { Tile::Black } else { Tile::White };
+        let map = MapComponents {
+            dimensions,
+            ..Default::default()
+        };
 
-                    let mut labels = Labels::default();
-                    labels.insert(format!("tile:{},{}", position.x, position.y));
+        commands.spawn(map).with_children(|commands| {
+            for (tile, position) in tiles.into_iter() {
+                let mut labels = Labels::default();
+                labels.insert(format!("tile:{},{}", position.x, position.y));
 
-                    commands.spawn(TileComponents { tile, position, labels });
-                }
+                commands.spawn(TileComponents { tile, position, labels });
             }
         })
+    }
+}
+
+impl Default for MapDescriptor {
+    fn default() -> Self {
+        let dimensions = Dimensions { width: 8, height: 8 };
+        let mut tiles = Vec::new();
+
+        for x in 0..=7 {
+            for y in 0..=7 {
+                let position = Position::new(x, y);
+                let tile = if (x + y) % 2 == 0 { Tile::Black } else { Tile::White };
+
+                tiles.push((tile, position));
+            }
+        }
+
+        MapDescriptor { dimensions, tiles }
     }
 }

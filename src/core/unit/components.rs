@@ -1,6 +1,7 @@
 use crate::prelude::*;
 use bevy::prelude::*;
 use derive_more::{Deref, From, Into};
+use serde::{Serialize, Deserialize};
 
 use super::store::UnitStore;
 
@@ -18,7 +19,7 @@ pub struct UnitComponents {
 // ==============================================================================
 // --- Components
 // ==============================================================================
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub enum Unit {
     Pawn,
     Bishop,
@@ -41,7 +42,7 @@ impl ToString for Unit {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Team {
     White,
     Black,
@@ -57,7 +58,7 @@ impl ToString for Team {
 }
 
 
-#[derive(Debug, Copy, Clone, From, Into, Deref)]
+#[derive(Debug, Copy, Clone, From, Into, Deref, Serialize, Deserialize)]
 pub struct Health(pub u32);
 
 

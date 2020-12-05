@@ -40,13 +40,8 @@ fn send_messages(
         let msg = "Hello from client!";
         println!("---> {:?}", msg);
 
-        net.send(
-            server,
-            msg.as_bytes(),
-            NetworkDelivery::ReliableSequenced(Some(1)),
-        ).unwrap();
-
-
+        let delivery = NetworkDelivery::ReliableSequenced(Some(1));
+        net.send(server, msg.as_bytes(), delivery).unwrap();
 
         state.message_timer.reset();
     }

@@ -1,5 +1,7 @@
 use crate::prelude::*;
 use bevy::prelude::*;
+use serde::{Serialize, Deserialize};
+
 use std::collections::HashMap;
 
 
@@ -10,7 +12,7 @@ pub struct TileComponents {
     pub labels: Labels,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Tile {
     Black,
     White,

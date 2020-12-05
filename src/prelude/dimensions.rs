@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, Copy, Default)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct Dimensions {
     pub width: i32,
     pub height: i32,

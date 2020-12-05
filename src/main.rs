@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-// use bevy_prototype_networking_laminar::{NetworkingPlugin, NetworkResource};
 
 use log::info;
 use std::net::SocketAddr;
