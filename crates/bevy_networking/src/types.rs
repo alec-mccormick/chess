@@ -42,7 +42,7 @@ pub struct SendConfig {
 }
 
 #[derive(Debug)]
-pub(crate) struct Message {
+pub(crate) struct MessageWithDestination {
     pub(crate) message: Bytes,
     pub(crate) delivery: NetworkDelivery,
     pub(crate) socket_handle: SocketHandle,
@@ -62,8 +62,6 @@ pub enum NetworkDelivery {
     ReliableSequenced(Option<u8>),
     ReliableOrdered(Option<u8>),
 }
-
-
 
 
 

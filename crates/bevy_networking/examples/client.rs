@@ -1,11 +1,11 @@
-use bevy::app::{ScheduleRunnerPlugin, ScheduleRunnerSettings};
+use bevy::app::{ScheduleRunnerPlugin};
 use bevy::prelude::*;
 
 use std::net::SocketAddr;
 use std::time::Duration;
 
 use bevy_networking::{
-    NetworkDelivery, NetworkEvent, NetworkResource, NetworkingPlugin,
+    NetworkDelivery, NetworkResource, NetworkingPlugin,
 };
 
 const SERVER: &str = "127.0.0.1:12351";

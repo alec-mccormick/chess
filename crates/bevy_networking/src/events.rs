@@ -1,22 +1,18 @@
 use bytes::Bytes;
-
-use super::{
-    error::NetworkError,
-    types::Connection,
-};
+use super::{error::NetworkError, types::Connection};
 
 
-// #[derive(Debug)]
-// pub struct ClientConnected(Connection);
-//
-// #[derive(Debug)]
-// pub struct ClientDisconnected(Connection);
-//
-// #[derive(Debug)]
-// pub struct MessageReceived(Connection, Bytes);
-//
-// #[derive(Debug)]
-// pub struct SendMessageError(NetworkError);
+#[derive(Debug)]
+pub struct ClientConnected(pub Connection);
+
+#[derive(Debug)]
+pub struct ClientDisconnected(pub Connection);
+
+#[derive(Debug)]
+pub struct MessageReceived(pub Connection, pub Bytes);
+
+#[derive(Debug)]
+pub struct SendError(pub NetworkError);
 
 
 #[derive(Debug)]

@@ -1,11 +1,12 @@
-use bevy::app::{ScheduleRunnerPlugin, ScheduleRunnerSettings};
+use bevy::app::{ScheduleRunnerPlugin};
 use bevy::prelude::*;
 
 use std::net::SocketAddr;
 use std::time::Duration;
 
 use bevy_networking::{
-    NetworkDelivery, NetworkEvent, NetworkResource, NetworkingPlugin,
+    events::MessageReceived,
+    NetworkDelivery, NetworkResource, NetworkingPlugin,
 };
 
 const SERVER: &str = "127.0.0.1:12351";
@@ -23,19 +24,22 @@ fn main() {
 }
 
 fn print_network_events(
-    mut reader: Local<EventReader<NetworkEvent>>,
-    events: Res<Events<NetworkEvent>>
+    mut reader: Local<EventReader<MessageReceived>>,
+    events: Res<Events<MessageReceived>>
 ) {
-    for event in reader.iter(&events) {
-        match event {
-            NetworkEvent::Message(conn, data) => {
-                let msg = String::from_utf8_lossy(&*data);
-                println!("<--- {:?} from {}", msg, conn);
-            }
-            NetworkEvent::Connected(conn) => println!("\tConnected: {}", conn),
-            NetworkEvent::Disconnected(conn) => println!("\tDisconnected: {}", conn),
-            NetworkEvent::SendError(err) => println!("\tSend Error: {}", err),
-        }
+    for MessageReceived(conn, data) in reader.iter(&events) {
+        let msg = String::from_utf8_lossy(&*data);
+        println!("<--- {:?} from {}", msg, conn);
+
+        // match event {
+        //     NetworkEvent::Message(conn, data) => {
+        //         let msg = String::from_utf8_lossy(&*data);
+        //         println!("<--- {:?} from {}", msg, conn);
+        //     }
+        //     NetworkEvent::Connected(conn) => println!("\tConnected: {}", conn),
+        //     NetworkEvent::Disconnected(conn) => println!("\tDisconnected: {}", conn),
+        //     NetworkEvent::SendError(err) => println!("\tSend Error: {}", err),
+        // }
     }
 }
 

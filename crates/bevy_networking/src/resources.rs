@@ -9,7 +9,7 @@ use std::{
 use super::{
     error::NetworkError,
     events::NetworkEvent,
-    types::{Connection, SendConfig, SocketHandle, Message, WorkerInstructions, NetworkDelivery, LaminarConfig, Transport},
+    types::{Connection, SendConfig, SocketHandle, MessageWithDestination, WorkerInstructions, NetworkDelivery, LaminarConfig, Transport},
 };
 
 
@@ -19,7 +19,7 @@ pub struct NetworkResource {
     pub(crate) bound_sockets: Vec<SocketHandle>,
     pub(crate) connections: Vec<Connection>,
     pub(crate) event_rx: Mutex<Receiver<NetworkEvent>>,
-    pub(crate) message_tx: Mutex<Sender<Message>>,
+    pub(crate) message_tx: Mutex<Sender<MessageWithDestination>>,
     pub(crate) instruction_tx: Mutex<Sender<WorkerInstructions>>,
 }
 
@@ -123,7 +123,7 @@ impl NetworkResource {
     ) -> Result<(), NetworkError> {
         let socket = self.get_socket_or_default(config.socket)?;
 
-        let msg = Message {
+        let msg = MessageWithDestination {
             destination: addr,
             delivery,
             socket_handle: socket,
@@ -146,7 +146,7 @@ impl NetworkResource {
         let broadcast_to = self.connections_for_socket(socket);
 
         for conn in broadcast_to {
-            let msg = Message {
+            let msg = MessageWithDestination {
                 destination: conn.addr,
                 delivery,
                 socket_handle: socket,

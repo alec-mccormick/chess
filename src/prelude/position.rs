@@ -1,7 +1,8 @@
 use std::ops::{Add, Deref};
+use serde::{Serialize, Deserialize};
 
 
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub struct Position {
     pub x: i32,
     pub y: i32,

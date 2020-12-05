@@ -926,6 +926,7 @@ dependencies = [
  "log",
  "lyon",
  "rand",
+ "serde",
 ]
 
 [[package]]

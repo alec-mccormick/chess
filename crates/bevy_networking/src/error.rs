@@ -6,7 +6,7 @@ use std::io;
 use std::sync::{MutexGuard, PoisonError};
 
 // use super::{Message, SocketHandle, WorkerInstructions};
-use super::types::{SocketHandle, WorkerInstructions, Message};
+use super::types::{SocketHandle, WorkerInstructions, MessageWithDestination};
 
 
 #[derive(Debug)]
@@ -51,8 +51,8 @@ impl From<SendError<WorkerInstructions>> for NetworkError {
     }
 }
 
-impl From<SendError<Message>> for NetworkError {
-    fn from(err: SendError<Message>) -> Self {
+impl From<SendError<MessageWithDestination>> for NetworkError {
+    fn from(err: SendError<MessageWithDestination>) -> Self {
         InternalError(InternalErrorKind::SendMessageError(err.to_string()))
     }
 }

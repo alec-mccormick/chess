@@ -9,14 +9,14 @@ use laminar::{Packet, Socket, SocketEvent};
 
 use super::error::NetworkError;
 use super::{Connection, NetworkEvent, NetworkResource, SocketHandle};
-use super::types::{WorkerInstructions, Message};
+use super::types::{WorkerInstructions, MessageWithDestination};
 
 const SEND_EXPECT: &str =
     "The networking worker thread is no longer able to send messages back to the receiver.";
 
 pub fn start_worker_thread() -> NetworkResource {
     let (mut event_tx, event_rx) = unbounded::<NetworkEvent>();
-    let (message_tx, message_rx) = unbounded::<Message>();
+    let (message_tx, message_rx) = unbounded::<MessageWithDestination>();
     let (instruction_tx, instruction_rx) = unbounded::<WorkerInstructions>();
 
     let mut sockets = TrackedSockets {
@@ -93,7 +93,7 @@ fn poll_sockets(sockets: &mut TrackedSockets) {
 
 fn send_messages(
     sockets: &mut TrackedSockets,
-    message_rx: &Receiver<Message>,
+    message_rx: &Receiver<MessageWithDestination>,
     event_tx: &mut Sender<NetworkEvent>,
 ) {
     while let Ok(message) = message_rx.try_recv() {

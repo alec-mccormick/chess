@@ -76,10 +76,10 @@ impl Game {
 
     fn handle_join_game_event(
         mut commands: Commands,
-        mut state: ResMut<GameState>,
         mut reader: Local<EventReader<JoinGameEvent>>,
         events: Res<Events<JoinGameEvent>>,
-        net: Res<NetworkResource>,
+        mut state: ResMut<GameState>,
+        // net: Res<NetworkResource>,
     ) {
         for event in reader.iter(&events) {
             debug!("handle_join_game_event() - joining game: {:?}", event);
@@ -92,7 +92,7 @@ impl Game {
 }
 
 /// ==========================================================================
-/// Game State
+/// Game Spawner
 /// ==========================================================================
 #[derive(Default)]
 struct GameSpawner;

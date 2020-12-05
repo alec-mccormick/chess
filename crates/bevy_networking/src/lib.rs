@@ -1,30 +1,33 @@
 use bevy::app::{AppBuilder, Events, EventReader, Plugin};
 use bevy::ecs::prelude::*;
-
+use bevy::prelude::stage;
 
 mod types;
 mod error;
 mod resources;
-mod events;
+pub mod events;
 mod worker;
 
 
+use events::NetworkEvent;
 pub use error::NetworkError;
-pub use events::NetworkEvent;
 pub use types::{Connection, SendConfig, SocketHandle, NetworkDelivery};
 pub use resources::NetworkResource;
 
 
-pub struct NetworkingPlugin;
 
+pub struct NetworkingPlugin;
 impl Plugin for NetworkingPlugin {
     fn build(&self, app: &mut AppBuilder) {
         let network_resource = worker::start_worker_thread();
 
         app
-            .add_event::<NetworkEvent>()
+            .add_event::<events::ClientConnected>()
+            .add_event::<events::ClientDisconnected>()
+            .add_event::<events::MessageReceived>()
+            .add_event::<events::SendError>()
             .add_resource(network_resource)
-            .add_system_to_stage(bevy::prelude::stage::EVENT,process_network_events.system());
+            .add_system_to_stage(stage::EVENT, process_network_events.system());
     }
 }
 
@@ -32,7 +35,10 @@ impl Plugin for NetworkingPlugin {
 
 fn process_network_events(
     mut net: ResMut<NetworkResource>,
-    mut network_events: ResMut<Events<NetworkEvent>>,
+    mut connected_events: ResMut<Events<events::ClientConnected>>,
+    mut disconnected_events: ResMut<Events<events::ClientDisconnected>>,
+    mut message_events: ResMut<Events<events::MessageReceived>>,
+    mut error_events: ResMut<Events<events::SendError>>,
 ) {
     let mut added_connections: Vec<Connection> = Vec::new();
     let mut removed_connections: Vec<Connection> = Vec::new();
@@ -59,18 +65,23 @@ fn process_network_events(
                         removed_connections.push(conn);
                     }
                 }
-                _ => network_events.send(event),
+                NetworkEvent::Message(conn, bytes) => {
+                    message_events.send(events::MessageReceived(conn, bytes));
+                }
+                NetworkEvent::SendError(error) => {
+                    error_events.send(events::SendError(error));
+                }
             }
         }
     }
 
     for conn in added_connections {
         net.add_connection(conn);
-        network_events.send(NetworkEvent::Connected(conn));
+        connected_events.send(events::ClientConnected(conn));
     }
 
     for conn in removed_connections {
         net.remove_connection(conn);
-        network_events.send(NetworkEvent::Disconnected(conn));
+        disconnected_events.send(events::ClientDisconnected(conn));
     }
 }
