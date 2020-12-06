@@ -27,7 +27,7 @@ impl Plugin for MapPlugin {
 // ==========================================================================
 // MapSpawner
 // ==========================================================================
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MapDescriptor {
     dimensions: Dimensions,
     tiles: Vec<(Tile, Position)>,

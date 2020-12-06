@@ -1,8 +1,8 @@
-use crate::prelude::*;
 use bevy::prelude::*;
-
+use bevy_networking::{NetworkResource, NetworkDelivery};
 use log::info;
 
+use crate::prelude::*;
 use crate::core::{
     unit::{is_action_valid, Actions, Health, Team, Unit, UnitCmd, UnitStore},
     GameState, Tile,
@@ -24,6 +24,7 @@ pub fn handle_tile_interaction(
     mut input_state: ResMut<InputState>,
     game_state: Res<GameState>,
     unit_store: Res<UnitStore>,
+    mut net: ResMut<NetworkResource>,
     mut cmds: ResMut<Events<UnitCmd>>,
     mut interaction_query: Query<With<Tile, (Mutated<Interaction>, &Position)>>,
     action_query: Query<(&Unit, &Position, &Team, &Health, &Actions)>,

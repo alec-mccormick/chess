@@ -13,6 +13,7 @@ pub struct UnitComponents {
     pub health: Health,
     pub position: Position,
     pub actions: Actions,
+    pub labels: Labels,
 }
 
 
@@ -112,3 +113,6 @@ pub enum ActionResult {
 pub enum UnitCmd {
     ExecuteAction(Entity, usize, Position),
 }
+
+#[derive(Debug, Copy, Clone)]
+pub struct ActionExecuted(pub Entity, pub usize, pub Position);

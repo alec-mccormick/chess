@@ -13,7 +13,7 @@ use events::NetworkEvent;
 pub use error::NetworkError;
 pub use types::{Connection, SendConfig, SocketHandle, NetworkDelivery};
 pub use resources::NetworkResource;
-
+pub use bytes::Bytes;
 
 
 pub struct NetworkingPlugin;

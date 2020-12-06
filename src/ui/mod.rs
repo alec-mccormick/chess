@@ -22,6 +22,7 @@ impl Plugin for UIPlugin {
             .add_system(main_menu::handle_create_main_menu_event.system())
             .add_system_to_stage(stage::UPDATE, main_menu::handle_main_menu_button_interaction.system())
             .add_system_to_stage(stage::UPDATE, main_menu::handle_start_button_pressed.system())
+            .add_system(main_menu::handle_join_button_pressed.system())
             .init_resource::<InputState>()
             .add_startup_system(setup.system())
             .add_plugin(InfoPanelPlugin)

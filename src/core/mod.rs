@@ -12,15 +12,12 @@ pub mod unit;
 mod game;
 
 pub use map::{Map, MapComponents, Tile, TileComponents};
-pub use unit::{Action, Actions, Health, Team, Unit, UnitCmd, UnitComponents};
+pub use unit::{Action, Actions, Health, Team, Unit, UnitCmd, UnitComponents, ActionExecuted};
 
 use map::MapPlugin;
 use unit::UnitPlugin;
 use game::GameDescriptor;
 
-
-const SERVER: &str = "127.0.0.1:12351";
-const CLIENT: &str = "127.0.0.1:12350";
 
 /// ==========================================================================
 /// Plugin
@@ -30,6 +27,7 @@ pub struct CorePlugin;
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
+            // .add_resource(GameStartingState::Default)
             .add_plugin(NetworkingPlugin)
             .add_startup_system(init_networking.system())
             .add_event::<CreateGameEvent>()
@@ -37,6 +35,8 @@ impl Plugin for CorePlugin {
             .add_plugin(MapPlugin)
             .add_plugin(UnitPlugin)
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_create_game_event.system())
+            .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_join_game_event.system())
+            .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_network_events.system())
             .add_resource(GameState::default())
             .add_system(GameState::handle_unit_cmd.system());
     }
@@ -61,73 +61,194 @@ pub struct JoinGameEvent {
     pub server_addr: SocketAddr,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayerInfo {
     pub name: String,
     pub team: Team,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum PlayerType {
+    Local,
+    Remote(SocketAddr),
 }
 
 
 struct Game;
 impl Game {
     fn handle_create_game_event(
-        mut commands: Commands,
         mut reader: Local<EventReader<CreateGameEvent>>,
         events: Res<Events<CreateGameEvent>>,
         mut state: ResMut<GameState>,
-        // net: Res<NetworkResource>,
     ) {
         for event in reader.iter(&events) {
             debug!("handle_create_game_event() - create game: {:?}", event);
 
-            state.player_info = event.player_info.clone();
-            GameDescriptor::default().spawn(&mut commands);
+            let player_info = event.player_info.clone();
+            state.init_local_player(player_info);
         }
     }
 
     fn handle_join_game_event(
-        mut commands: Commands,
         mut reader: Local<EventReader<JoinGameEvent>>,
         events: Res<Events<JoinGameEvent>>,
         mut state: ResMut<GameState>,
-        // net: Res<NetworkResource>,
+        net: Res<NetworkResource>,
     ) {
         for event in reader.iter(&events) {
             debug!("handle_join_game_event() - joining game: {:?}", event);
 
-            state.connection_info = ConnectionInfo::Client(event.server_addr);
-            state.player_info = event.player_info.clone();
-            GameDescriptor::default().spawn(&mut commands);
+            let player_info = event.player_info.clone();
+
+            state.init_local_player(player_info.clone());
+            state.connection_info = ConnectionInfo::Client;
+
+            let delivery = NetworkDelivery::ReliableSequenced(Some(1));
+            let message = Message::JoinRequest(player_info).to_bytes().unwrap();
+            net.send(event.server_addr, &message, delivery).unwrap();
         }
+    }
+
+    fn handle_network_events(
+        mut commands: Commands,
+        mut reader: Local<EventReader<MessageReceived>>,
+        events: Res<Events<MessageReceived>>,
+        mut state: ResMut<GameState>,
+        mut net: ResMut<NetworkResource>,
+        mut action_executed_events: ResMut<Events<ActionExecuted>>,
+        query: Query<With<Unit, (Entity, &Labels)>>,
+    ) {
+        for event in reader.iter(&events) {
+            let MessageReceived(conn, data) = event;
+
+            let from = conn.addr;
+
+            println!("Connection! {:?}", conn);
+            let message = Message::from_bytes(&*data).unwrap();
+
+            match message {
+                Message::JoinRequest(player_info) => {
+                    Self::handle_join_request(&mut commands, &mut state, &mut net, from, player_info);
+                },
+                Message::JoinResponse(player_info, game_descriptor) => {
+                    Self::handle_join_response(&mut commands, &mut state, from, player_info, game_descriptor);
+                },
+                Message::MoveRequest(id, position) => {
+                    println!("RECEIVED MOVE REQUEST: {} {:?}", id, position);
+
+                    // let entities = entity_labels.get(id.as_str()).unwrap();
+                    // let entity = entities[0];
+
+                    let entity = query.iter().find_map(|(entity, labels)| {
+                        if labels.contains(id.clone()) { Some(entity) } else { None }
+                    }).unwrap();
+
+                    println!("Entity!: {:?}", entity);
+
+                    action_executed_events.send(ActionExecuted(entity, 0, position));
+                },
+            }
+        }
+    }
+
+    fn handle_join_request(
+        commands: &mut Commands,
+        state: &mut ResMut<GameState>,
+        net: &mut ResMut<NetworkResource>,
+        from: SocketAddr,
+        player_info: PlayerInfo,
+    ) {
+        info!("handle_join_request()");
+
+        let game_descriptor = GameDescriptor::default();
+
+        // Add remote player to player list
+        state.players.push((PlayerType::Remote(from), player_info));
+
+        let local_player_info = state.local_player_info.clone();
+
+        // Send response with local player info & game descriptor
+        let delivery = NetworkDelivery::ReliableSequenced(Some(1));
+        let message = Message::JoinResponse(local_player_info, game_descriptor.clone()).to_bytes().unwrap();
+
+        net.send(from, &message, delivery).unwrap();
+
+        info!("handle_join_request() - join response sent");
+        game_descriptor.spawn(commands);
+    }
+
+    fn handle_join_response(
+        commands: &mut Commands,
+        state: &mut ResMut<GameState>,
+        from: SocketAddr,
+        player_info: PlayerInfo,
+        game_descriptor: GameDescriptor,
+    ) {
+        info!("handle_join_response()");
+
+        // Add remote player to list
+        state.players.push((PlayerType::Remote(from), player_info));
+
+        // Spawn game & move starting state to complete
+        game_descriptor.spawn(commands);
+    }
+
+    fn handle_move_request(
+
+    ) {
+        info!("handle_move_request()");
+
+
     }
 }
 
 
-pub enum GameStartingState {
-    Loading,
-    WaitingForClient,
-    Complete,
+// pub enum GameStartingState {
+//     Default,
+//     Loading,
+//     WaitingForClient,
+//     WaitingToJoin,
+//     Complete,
+// }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum Message {
+    JoinRequest(PlayerInfo),
+    JoinResponse(PlayerInfo, GameDescriptor),
+    MoveRequest(String, Position),
 }
+
+impl Message {
+    fn to_bytes(&self) -> bincode::Result<Vec<u8>> {
+        bincode::serialize(self)
+    }
+
+    fn from_bytes(data: &[u8]) -> bincode::Result<Self> {
+        bincode::deserialize(data)
+    }
+}
+
 
 /// ==========================================================================
 /// Game State
 /// ==========================================================================
 #[derive(Debug, Clone)]
 pub struct GameState {
-    pub player_info: PlayerInfo,
+    pub local_player_info: PlayerInfo,
+    pub players: Vec<(PlayerType, PlayerInfo)>,
     pub active_team: Team,
     pub connection_info: ConnectionInfo,
     pub game_type: GameType,
 }
 
-
 impl Default for GameState {
     fn default() -> Self {
         GameState {
-            player_info: PlayerInfo {
+            local_player_info: PlayerInfo {
                 name: "Player 1".into(),
                 team: Team::White,
             },
+            players: vec![],
             active_team: Team::White,
             connection_info: ConnectionInfo::Server,
             game_type: GameType::Networked,
@@ -136,21 +257,28 @@ impl Default for GameState {
 }
 
 impl GameState {
+    fn init_local_player(&mut self, player_info: PlayerInfo) {
+        self.local_player_info = player_info.clone();
+        self.players = vec![(PlayerType::Local, player_info)];
+    }
+}
+
+
+impl GameState {
     fn handle_unit_cmd(
-        mut reader: Local<EventReader<UnitCmd>>,
-        events: Res<Events<UnitCmd>>,
+        mut reader: Local<EventReader<ActionExecuted>>,
+        events: Res<Events<ActionExecuted>>,
         mut state: ResMut<GameState>,
     ) {
-        for cmd in reader.iter(&events) {
-            if let UnitCmd::ExecuteAction(_entity, _index, _pos) = cmd {
-                state.active_team = match state.active_team {
-                    Team::White => Team::Black,
-                    Team::Black => Team::White,
-                }
+        for _event in reader.iter(&events) {
+            state.active_team = match state.active_team {
+                Team::White => Team::Black,
+                Team::Black => Team::White,
             }
         }
     }
 }
+
 #[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum GameType {
     // Hotseat,
@@ -165,7 +293,7 @@ pub enum GameType {
 #[derive(Debug, Clone)]
 pub enum ConnectionInfo {
     Server,
-    Client(SocketAddr),
+    Client,
 }
 
 impl ConnectionInfo {

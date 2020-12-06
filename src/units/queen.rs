@@ -16,6 +16,7 @@ pub fn queen() -> UnitComponents {
         health: Health(1),
         position: Position::new(0, 0),
         actions: Actions(vec![Box::new(QueenMoveAction)]),
+        labels: Labels::default(),
     }
 }
 

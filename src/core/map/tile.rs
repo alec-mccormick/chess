@@ -12,7 +12,7 @@ pub struct TileComponents {
     pub labels: Labels,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Tile {
     Black,
     White,

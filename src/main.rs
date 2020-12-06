@@ -15,8 +15,11 @@ const CLIENT: &str = "127.0.0.1:12350";
 fn main() {
     env_logger::init();
 
-    let addr: SocketAddr = SERVER.parse().expect("Unable to parse socket address");
+    let address = std::env::var("ADDR").unwrap_or(SERVER.into());
 
+    let addr: SocketAddr = address.parse().expect("Unable to parse socket address");
+
+    println!("Launching game on address: {}", address);
 
     App::build()
         .add_resource(WindowDescriptor {
@@ -27,7 +30,7 @@ fn main() {
             resizable: false,
             ..Default::default()
         })
-        // .add_system_to_stage(stage::FIRST, print_frame.system())
+        // .add_system_to_stage(stage::FIRST, print_frame.system())+
         .add_plugins(DefaultPlugins)
         .add_resource(ServerBindAddr(addr))
         .add_plugin(CorePlugin)

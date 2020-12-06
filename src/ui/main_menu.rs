@@ -5,6 +5,7 @@ use crate::{
     core::{CreateGameEvent, PlayerInfo, Team},
     prelude::*,
 };
+use crate::core::JoinGameEvent;
 
 
 pub struct CreateMainMenuEvent;
@@ -181,6 +182,38 @@ pub fn handle_start_button_pressed(
             name: "Player 1".into(),
             team: Team::White,
         },
+    });
+}
+
+pub fn handle_join_button_pressed(
+    mut commands: Commands,
+    mut join_game_events: ResMut<Events<JoinGameEvent>>,
+    main_menu_query: Query<With<MainMenu, Entity>>,
+    interaction_query: Query<With<JoinButton, Mutated<Interaction>>>,
+) {
+    let clicks = interaction_query
+        .iter()
+        .filter(|interaction| **interaction == Interaction::Clicked)
+        .next();
+
+    if clicks.is_none() {
+        return;
+    }
+
+    debug!("handle_join_button_pressed()");
+
+    let server_addr = std::env::var("SERVER_ADDR").unwrap();
+
+    for entity in main_menu_query.iter() {
+        commands.despawn_recursive(entity);
+    }
+
+    join_game_events.send(JoinGameEvent {
+        player_info: PlayerInfo {
+            name: "Player2".into(),
+            team: Team::Black,
+        },
+        server_addr: server_addr.parse().expect("Unable to parse socket address")
     });
 }
 
