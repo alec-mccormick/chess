@@ -24,7 +24,6 @@ pub fn handle_tile_interaction(
     mut input_state: ResMut<InputState>,
     game_state: Res<GameState>,
     unit_store: Res<UnitStore>,
-    mut net: ResMut<NetworkResource>,
     mut cmds: ResMut<Events<UnitCmd>>,
     mut interaction_query: Query<With<Tile, (Mutated<Interaction>, &Position)>>,
     action_query: Query<(&Unit, &Position, &Team, &Health, &Actions)>,
@@ -38,7 +37,8 @@ pub fn handle_tile_interaction(
 
                         let team = action_query.get_component::<Team>(*entity).unwrap();
 
-                        if team.eq(&game_state.active_team) {
+                        if team.eq(&game_state.active_team)
+                            && team.eq(&game_state.local_player_info.team) {
                             info!("Unit for active team selected");
                             *input_state = InputState::UnitSelected(*entity);
                         } else {

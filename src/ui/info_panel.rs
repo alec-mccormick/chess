@@ -1,5 +1,5 @@
 use crate::{
-    core::{unit::Team, CreateGameEvent, GameState},
+    core::{unit::Team, GameStartedEvent, GameState},
     prelude::*,
 };
 use bevy::prelude::*;
@@ -10,15 +10,15 @@ impl Plugin for InfoPanelPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
             // .add_startup_system(setup.system())
-            .add_system(handle_create_game_event.system())
+            .add_system(handle_game_started_event.system())
             .add_system(ActivePlayerView::handle_game_state_changed.system());
     }
 }
 
-fn handle_create_game_event(
+fn handle_game_started_event(
     mut commands: Commands,
-    mut reader: Local<EventReader<CreateGameEvent>>,
-    events: Res<Events<CreateGameEvent>>,
+    mut reader: Local<EventReader<GameStartedEvent>>,
+    events: Res<Events<GameStartedEvent>>,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {

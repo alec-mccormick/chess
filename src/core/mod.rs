@@ -32,6 +32,7 @@ impl Plugin for CorePlugin {
             .add_startup_system(init_networking.system())
             .add_event::<CreateGameEvent>()
             .add_event::<JoinGameEvent>()
+            .add_event::<GameStartedEvent>()
             .add_plugin(MapPlugin)
             .add_plugin(UnitPlugin)
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_create_game_event.system())
@@ -61,6 +62,9 @@ pub struct JoinGameEvent {
     pub server_addr: SocketAddr,
 }
 
+#[derive(Debug, Clone)]
+pub struct GameStartedEvent;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayerInfo {
     pub name: String,
@@ -79,6 +83,7 @@ impl Game {
     fn handle_create_game_event(
         mut reader: Local<EventReader<CreateGameEvent>>,
         events: Res<Events<CreateGameEvent>>,
+        mut game_started_events: ResMut<Events<GameStartedEvent>>,
         mut state: ResMut<GameState>,
     ) {
         for event in reader.iter(&events) {
@@ -86,12 +91,15 @@ impl Game {
 
             let player_info = event.player_info.clone();
             state.init_local_player(player_info);
+
+            game_started_events.send(GameStartedEvent);
         }
     }
 
     fn handle_join_game_event(
         mut reader: Local<EventReader<JoinGameEvent>>,
         events: Res<Events<JoinGameEvent>>,
+        mut game_started_events: ResMut<Events<GameStartedEvent>>,
         mut state: ResMut<GameState>,
         net: Res<NetworkResource>,
     ) {
@@ -106,6 +114,8 @@ impl Game {
             let delivery = NetworkDelivery::ReliableSequenced(Some(1));
             let message = Message::JoinRequest(player_info).to_bytes().unwrap();
             net.send(event.server_addr, &message, delivery).unwrap();
+
+            game_started_events.send(GameStartedEvent);
         }
     }
 
@@ -121,9 +131,9 @@ impl Game {
         for event in reader.iter(&events) {
             let MessageReceived(conn, data) = event;
 
-            let from = conn.addr;
-
             println!("Connection! {:?}", conn);
+
+            let from = conn.addr;
             let message = Message::from_bytes(&*data).unwrap();
 
             match message {
@@ -136,15 +146,13 @@ impl Game {
                 Message::MoveRequest(id, position) => {
                     println!("RECEIVED MOVE REQUEST: {} {:?}", id, position);
 
-                    // let entities = entity_labels.get(id.as_str()).unwrap();
-                    // let entity = entities[0];
-
-                    let entity = query.iter().find_map(|(entity, labels)| {
-                        if labels.contains(id.clone()) { Some(entity) } else { None }
-                    }).unwrap();
+                    let entity = query.iter()
+                        .filter(|(_, labels)| labels.contains(id.clone()))
+                        .map(|(entity, _)| entity)
+                        .next()
+                        .unwrap();
 
                     println!("Entity!: {:?}", entity);
-
                     action_executed_events.send(ActionExecuted(entity, 0, position));
                 },
             }
@@ -191,14 +199,6 @@ impl Game {
 
         // Spawn game & move starting state to complete
         game_descriptor.spawn(commands);
-    }
-
-    fn handle_move_request(
-
-    ) {
-        info!("handle_move_request()");
-
-
     }
 }
 
