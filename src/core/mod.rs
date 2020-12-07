@@ -26,8 +26,7 @@ pub struct CorePlugin;
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_entity_map::<Id>()
-            .add_plugin(NetworkingPlugin)
-            .add_startup_system(init_networking.system())
+            // .add_startup_system(init_networking.system())
             .add_position_map::<Tile>()
             .add_event::<CreateGameEvent>()
             .add_event::<JoinGameEvent>()
@@ -41,10 +40,10 @@ impl Plugin for CorePlugin {
     }
 }
 
-fn init_networking(server_bind_addr: Res<ServerBindAddr>, mut net: ResMut<NetworkResource>) {
-    info!("Binding to address: {:?}", server_bind_addr.0);
-    net.bind(server_bind_addr.0).unwrap();
-}
+// fn init_networking(server_bind_addr: Res<ServerBindAddr>, mut net: ResMut<NetworkResource>) {
+//     info!("Binding to address: {:?}", server_bind_addr.0);
+//     net.bind(server_bind_addr.0).unwrap();
+// }
 
 /// ==========================================================================
 /// Game
@@ -198,15 +197,6 @@ impl Game {
     }
 }
 
-
-// pub enum GameStartingState {
-//     Default,
-//     Loading,
-//     WaitingForClient,
-//     WaitingToJoin,
-//     Complete,
-// }
-
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Message {
     JoinRequest(PlayerInfo),
@@ -282,6 +272,12 @@ pub enum GameType {
     Networked,
 }
 
+#[derive(Debug)]
+pub struct AppConfig {
+    pub port: String,
+
+    pub remote_addr: Option<String>,
+}
 
 /// ==========================================================================
 /// Other
@@ -304,5 +300,3 @@ impl ConnectionInfo {
         !self.is_server()
     }
 }
-
-pub struct ServerBindAddr(pub SocketAddr);

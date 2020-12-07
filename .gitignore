@@ -3,3 +3,5 @@
 /scratch
 
 crates/*/target
+
+.envrc

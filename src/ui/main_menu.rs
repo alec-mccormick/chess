@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use log::{debug, info};
 
 use crate::{
-    core::{CreateGameEvent, JoinGameEvent, PlayerInfo, Team},
+    core::{CreateGameEvent, JoinGameEvent, PlayerInfo, Team, AppConfig},
     prelude::*,
 };
 
@@ -186,6 +186,7 @@ pub fn handle_start_button_pressed(
 
 pub fn handle_join_button_pressed(
     mut commands: Commands,
+    app_config: Res<AppConfig>,
     mut join_game_events: ResMut<Events<JoinGameEvent>>,
     main_menu_query: Query<With<MainMenu, Entity>>,
     interaction_query: Query<With<JoinButton, Mutated<Interaction>>>,
@@ -201,7 +202,7 @@ pub fn handle_join_button_pressed(
 
     debug!("handle_join_button_pressed()");
 
-    let server_addr = std::env::var("SERVER_ADDR").unwrap();
+    let server_addr = app_config.remote_addr.clone().unwrap();
 
     for entity in main_menu_query.iter() {
         commands.despawn_recursive(entity);
