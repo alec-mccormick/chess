@@ -26,8 +26,7 @@ use unit::UnitPlugin;
 pub struct CorePlugin;
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.init_resource::<EntityIds>()
-            .add_system_to_stage(stage::POST_UPDATE, entity_ids_system.system())
+        app.add_entity_map::<Id>()
             .add_plugin(NetworkingPlugin)
             .add_startup_system(init_networking.system())
             .add_event::<CreateGameEvent>()
@@ -126,7 +125,7 @@ impl Game {
         mut state: ResMut<GameState>,
         mut net: ResMut<NetworkResource>,
         mut action_executed_events: ResMut<Events<ActionExecuted>>,
-        entity_ids: Res<EntityIds>,
+        entity_id_map: Res<EntityMap<Id>>,
     ) {
         for event in reader.iter(&events) {
             let MessageReceived(conn, data) = event;
@@ -146,7 +145,7 @@ impl Game {
                 Message::MoveRequest(id, position) => {
                     println!("RECEIVED MOVE REQUEST: {:?} {:?}", id, position);
 
-                    let entity = entity_ids.get_entity(&id).unwrap();
+                    let entity = entity_id_map.get(&id).unwrap();
 
                     println!("Entity!: {:?}", entity);
                     action_executed_events.send(ActionExecuted(entity.clone(), 0, position));

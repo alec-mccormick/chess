@@ -5,7 +5,7 @@ use bevy_prototype_lyon::prelude::*;
 
 use crate::core::{
     map::TileStore,
-    unit::{Actions, Health, Team, Unit, UnitStore},
+    unit::{Actions, Health, Team, Unit},
     Map, Tile,
 };
 use log::info;
@@ -28,7 +28,7 @@ use std::ops::Deref;
 pub fn handle_input_state_change(
     mut previous_state: Local<Option<InputState>>,
     input_state: ChangedRes<InputState>,
-    unit_store: Res<UnitStore>,
+    unit_position_map: Res<PositionMap<Unit>>,
     tile_store: Res<TileStore>,
     mut tile_query: Query<(&Tile, &mut TileOverlayState)>,
     action_query: Query<(&Unit, &Position, &Team, &Health, &Actions)>,
@@ -45,7 +45,7 @@ pub fn handle_input_state_change(
             let actions = action_query.get_component::<Actions>(entity.clone()).unwrap();
             let action = actions.get(0).unwrap();
 
-            for target in action.list_targets(&entity, &unit_store, &action_query) {
+            for target in action.list_targets(&entity, &unit_position_map, &action_query) {
                 info!("! Target {:?}", target);
 
                 let tile_entity = tile_store.0.get(&target).unwrap();
@@ -62,7 +62,7 @@ pub fn handle_input_state_change(
                 let actions = action_query.get_component::<Actions>(entity.clone()).unwrap();
                 let action = actions.get(0).unwrap();
 
-                for target in action.list_targets(&entity, &unit_store, &action_query) {
+                for target in action.list_targets(&entity, &unit_position_map, &action_query) {
                     info!("! Target {:?}", target);
 
                     let tile_entity = tile_store.0.get(&target).unwrap();

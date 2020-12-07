@@ -20,31 +20,3 @@ impl Id {
         &self.0
     }
 }
-
-
-#[derive(Debug, Default)]
-pub struct EntityIds {
-    id_to_entity: HashMap<Id, Entity>,
-    entity_to_id: HashMap<Entity, Id>,
-}
-
-impl EntityIds {
-    pub fn get_id(&self, entity: &Entity) -> Option<&Id> {
-        self.entity_to_id.get(entity)
-    }
-
-    pub fn get_entity(&self, id: &Id) -> Option<&Entity> {
-        self.id_to_entity.get(id)
-    }
-
-    pub fn set(&mut self, id: Id, entity: Entity) {
-        self.id_to_entity.insert(id.clone(), entity.clone());
-        self.entity_to_id.insert(entity, id);
-    }
-}
-
-pub fn entity_ids_system(mut entity_ids: ResMut<EntityIds>, query: Query<(Entity, Changed<Id>)>) {
-    for (entity, id) in query.iter() {
-        entity_ids.set(*id, entity);
-    }
-}

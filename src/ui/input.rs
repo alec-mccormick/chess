@@ -4,7 +4,7 @@ use log::info;
 
 use crate::{
     core::{
-        unit::{is_action_valid, Actions, Health, Team, Unit, UnitCmd, UnitStore},
+        unit::{is_action_valid, Actions, Health, Team, Unit, UnitCmd},
         GameState, Tile,
     },
     prelude::*,
@@ -25,7 +25,7 @@ impl Default for InputState {
 pub fn handle_tile_interaction(
     mut input_state: ResMut<InputState>,
     game_state: Res<GameState>,
-    unit_store: Res<UnitStore>,
+    unit_position_map: Res<PositionMap<Unit>>,
     mut cmds: ResMut<Events<UnitCmd>>,
     mut interaction_query: Query<With<Tile, (Mutated<Interaction>, &Position)>>,
     action_query: Query<(&Unit, &Position, &Team, &Health, &Actions)>,
@@ -34,7 +34,7 @@ pub fn handle_tile_interaction(
         match *interaction {
             Interaction::Clicked => match *input_state {
                 InputState::Idle => {
-                    if let Some(entity) = unit_store.get_unit(position) {
+                    if let Some(entity) = unit_position_map.get(position) {
                         info!("-- unit selected: {:?}", entity);
 
                         let team = action_query.get_component::<Team>(*entity).unwrap();
@@ -51,7 +51,7 @@ pub fn handle_tile_interaction(
                     let actions = action_query.get_component::<Actions>(entity.clone()).unwrap();
                     let action = actions.get(0).unwrap();
 
-                    if is_action_valid(action, &entity, position, &unit_store, &action_query) {
+                    if is_action_valid(action, &entity, position, &unit_position_map, &action_query) {
                         info!("Execute action {:?}", entity);
                         cmds.send(UnitCmd::ExecuteAction(entity, 0, *position));
                     }

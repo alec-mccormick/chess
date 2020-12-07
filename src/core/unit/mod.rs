@@ -1,8 +1,5 @@
 mod components;
-mod store;
-
 pub use components::*;
-pub use store::*;
 
 use super::{GameState, Message, PlayerType};
 use crate::prelude::*;
@@ -21,11 +18,10 @@ impl Plugin for UnitPlugin {
         app.add_event::<UnitCmd>()
             .add_event::<ActionExecuted>()
             .add_event::<ActionResult>()
-            .add_resource(UnitStore::default())
+            .add_position_map::<Unit>()
             .add_system(handle_action_result.system())
             .add_system(handle_unit_cmd_system.system())
-            .add_system(UnitStore::handle_position_changed.system())
-            .add_system(UnitStore::handle_health_changed.system())
+            .add_system(handle_health_changed.system())
             .add_system(handle_action_executed_system.system());
     }
 }
@@ -34,7 +30,7 @@ fn handle_unit_cmd_system(
     mut reader: Local<EventReader<UnitCmd>>,
     events: Res<Events<UnitCmd>>,
     mut action_events: ResMut<Events<ActionExecuted>>,
-    store: Res<UnitStore>,
+    store: Res<PositionMap<Unit>>,
     game_state: Res<GameState>,
     mut net: ResMut<NetworkResource>,
     action_query: Query<(&Unit, &Position, &Team, &Health, &Actions)>,
@@ -84,7 +80,7 @@ fn handle_action_executed_system(
     mut reader: Local<EventReader<ActionExecuted>>,
     events: Res<Events<ActionExecuted>>,
     mut action_events: ResMut<Events<ActionResult>>,
-    store: Res<UnitStore>,
+    store: Res<PositionMap<Unit>>,
     action_query: Query<(&Unit, &Position, &Team, &Health, &Actions)>,
 ) {
     for event in reader.iter(&events) {
@@ -116,6 +112,22 @@ fn handle_action_result(
             ActionResult::SetHealth(entity, health) => {
                 query.set(*entity, *health).unwrap();
             }
+        }
+    }
+}
+
+fn handle_health_changed(
+    mut commands: Commands,
+    mut unit_position_map: ResMut<PositionMap<Unit>>,
+    query: Query<With<Unit, (Entity, Mutated<Health>)>>,
+) {
+    for (entity, health) in query.iter() {
+        debug!("handle_health_changed() {:?} {:?}", entity, *health);
+
+        if health.0 == 0 {
+            debug!("!!!Unit reduced to 0 health: {:?}", entity);
+            commands.despawn(entity);
+            unit_position_map.remove_entity(&entity);
         }
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    core::unit::{Action, ActionResult, Actions, Health, Team, Unit, UnitCmd, UnitComponents, UnitStore},
+    core::unit::{Action, ActionResult, Actions, Health, Team, Unit, UnitCmd, UnitComponents},
     prelude::*,
 };
 use bevy::prelude::*;
@@ -27,7 +27,7 @@ impl Action for QueenMoveAction {
     fn list_targets(
         &self,
         entity: &Entity,
-        store: &Res<UnitStore>,
+        store: &Res<PositionMap<Unit>>,
         query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
     ) -> Box<dyn Iterator<Item = Position>> {
         let position = query.get_component::<Position>(*entity).unwrap();
@@ -56,7 +56,7 @@ impl Action for QueenMoveAction {
         &self,
         entity: &Entity,
         target: &Position,
-        store: &Res<UnitStore>,
+        store: &Res<PositionMap<Unit>>,
         query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
     ) -> Box<dyn Iterator<Item = ActionResult>> {
         Box::new(move_unit(entity, target, store, query))

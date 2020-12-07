@@ -3,8 +3,6 @@ use bevy::prelude::*;
 use derive_more::{Deref, From, Into};
 use serde::{Deserialize, Serialize};
 
-use super::store::UnitStore;
-
 
 #[derive(Bundle)]
 pub struct UnitComponents {
@@ -76,7 +74,7 @@ pub trait Action {
     fn list_targets(
         &self,
         entity: &Entity,
-        store: &Res<UnitStore>,
+        store: &Res<PositionMap<Unit>>,
         query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
     ) -> Box<dyn Iterator<Item = Position>>;
 
@@ -84,7 +82,7 @@ pub trait Action {
         &self,
         entity: &Entity,
         target: &Position,
-        store: &Res<UnitStore>,
+        store: &Res<PositionMap<Unit>>,
         query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
     ) -> Box<dyn Iterator<Item = ActionResult>>;
 }
@@ -94,7 +92,7 @@ pub fn is_action_valid(
     action: &Box<dyn Action + Send + Sync>,
     entity: &Entity,
     target: &Position,
-    store: &Res<UnitStore>,
+    store: &Res<PositionMap<Unit>>,
     query: &Query<(&Unit, &Position, &Team, &Health, &Actions)>,
 ) -> bool {
     action.list_targets(entity, store, query).any(|p| p == *target)
