@@ -1,9 +1,20 @@
 ## Chess
 
-To run in debug mode:
+This project's primary role is to serve as a framework for an isometric 
+turn-based game written in Rust with Bevy engine.
+
+Run the following commands to launch:
 ```
-# RUST_LOG=chess=debug cargo run
+# Launch application with the title "Chess A" to act as the server.
+$ cargo run -- --port 12351 --title "Chess A"
+
+# Launch application with the title "Chess B" to act as the client & configure it to connect.
+$ cargo run -- --port 12350 --title "Chess B" --remote "127.0.0.1:12351"
 ```
+
+
+Set the environment variable RUST_LOG="chess=debug" for debug logs.
+
 
 ## Roadmap
 
@@ -20,30 +31,26 @@ To run in debug mode:
 - [x] Add Networking
     - [x] Serialize/deserialize board
     - [x] Serialize/deserialize messages 
+    - [ ] Add reconnection functionality
 - [ ] Migrate to using SpriteConfig
-- [ ] Add Bot AI
+- [ ] Migrate to animated sprites
 - [ ] Show movable squares on hover
+- [ ] Add Bot AI
+- [ ] 
 - [x] Add startup screen
     - [ ] Allow user to select team
 - [ ] Build Action UI
     - [ ] Add Icon
     - [ ] Add Description
-- [ ] Add State Machine
 - [x] Add events for action executed, etc.
 - [ ] Update Action to no longer rely on Query
     - [x] Maintain internal list of all units in UnitStore?
     - [x] Migrate to ObjectId
 
-
-### Gameplay Thoughts
-
-- Explore mtg like synergies in tactical gameplay
-- Consider what makes synergy preferable to "just good shit" squads.
-    - large bloated reward systems tend to be less synergistic. Turning down rewards in STS
-      is often better than taking them.
-
     
 ## Bevy Stages
+
+This is just here for reference
 
 ```
 app::FIRST
