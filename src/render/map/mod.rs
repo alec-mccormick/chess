@@ -7,7 +7,7 @@ use bevy_prototype_lyon::prelude::*;
 
 use super::utils::{self, HALF_TILE_RENDER_HEIGHT_PX, HALF_TILE_RENDER_WIDTH_PX};
 use crate::{
-    core::map::{Map, Tile},
+    core::{AppConfig, map::{Map, Tile}},
     prelude::*,
 };
 
@@ -32,11 +32,15 @@ pub struct GameCamera;
 /// ==========================================================================
 /// Map Rendering
 /// ==========================================================================
-pub fn handle_map_spawned(mut commands: Commands, query: Query<(Entity, &Dimensions, Added<Map>)>) {
+pub fn handle_map_spawned(
+    mut commands: Commands,
+    app_config: Res<AppConfig>,
+    query: Query<(Entity, &Dimensions, Added<Map>)>
+) {
     for (entity, dimensions, _map) in query.iter() {
         debug!("handle_map_spawned() - Insert Mesh components for rendering");
 
-        let scale = Vec3::splat(2.5);
+        let scale = Vec3::splat(app_config.scale * 2.5);
         let translation = utils::convert_dimensions_to_map_offset(dimensions) * scale;
 
         commands.insert(

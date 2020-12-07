@@ -34,6 +34,10 @@ struct Opts {
     /// Window Title
     #[clap(long, default_value = "Chess!")]
     pub title: String,
+
+    /// Window Size Scale
+    #[clap(long, default_value = "1.0")]
+    pub scale: f32,
 }
 
 
@@ -45,6 +49,7 @@ fn main() {
     let config = AppConfig {
         port: opts.port,
         remote_addr: opts.remote,
+        scale: opts.scale,
     };
 
     println!("App Config is: {:?}", config);
@@ -54,8 +59,8 @@ fn main() {
         .add_resource(config)
         .add_resource(WindowDescriptor {
             title: opts.title,
-            width: opts.width,
-            height: opts.height,
+            width: ((opts.width as f32) * opts.scale) as u32,
+            height: ((opts.height as f32) * opts.scale) as u32,
             vsync: false,
             resizable: false,
             ..Default::default()

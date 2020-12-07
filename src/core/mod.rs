@@ -275,8 +275,9 @@ pub enum GameType {
 #[derive(Debug)]
 pub struct AppConfig {
     pub port: String,
-
     pub remote_addr: Option<String>,
+
+    pub scale: f32,
 }
 
 /// ==========================================================================
