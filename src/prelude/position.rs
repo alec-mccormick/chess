@@ -1,8 +1,9 @@
+use bevy::prelude::*;
 use std::ops::{Add};
-use bevy::prelude::Entity;
 use std::hash::Hash;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
+use std::marker::PhantomData;
 
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Hash)]
@@ -40,9 +41,29 @@ impl From<&(i32, i32)> for Position {
     }
 }
 
-// pub struct PositionMap<T>
-//     where T: Hash + Eq {
-//
+// pub struct PositionMap<T> where T: Hash + Eq {
 //     position_to_entity: HashMap<Position, Entity>,
-//     entity_to_position: HashMap<Entity, Position>
+//     entity_to_position: HashMap<Entity, Position>,
+//     phantom: PhantomData<T>,
+// }
+//
+// impl<T> PositionMap<T> {
+//     pub fn new() -> Self {
+//         unimplemented!()
+//     }
+//
+// }
+//
+// pub fn add_position_map<T>(app: &mut AppBuilder) {
+//     app
+//         .add_resource(PositionMap::<T>::new())
+//         .add_system(handle_position_changed::<T>.system())
+//     ;
+// }
+//
+// fn handle_position_changed<T>(
+//     mut position_map: ResMut<PositionMap<T>>,
+//     query: Query<With<T, (Entity, Changed<Position>)>>
+// ) {
+//
 // }
