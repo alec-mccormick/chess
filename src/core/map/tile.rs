@@ -26,17 +26,3 @@ impl ToString for Tile {
         }
     }
 }
-
-#[derive(Debug, Default)]
-pub struct TileStore(pub HashMap<Position, Entity>);
-
-impl TileStore {
-    pub fn handle_position_changed(
-        mut store: ResMut<TileStore>,
-        query: Query<With<Tile, (Entity, Changed<Position>)>>,
-    ) {
-        for (entity, position) in query.iter() {
-            store.0.insert(*position, entity);
-        }
-    }
-}

@@ -15,7 +15,6 @@ pub use map::{Map, MapComponents, Tile, TileComponents};
 pub use unit::{Action, ActionExecuted, Actions, Health, Team, Unit, UnitCmd, UnitComponents};
 
 use game::GameDescriptor;
-use map::MapPlugin;
 use unit::UnitPlugin;
 
 
@@ -29,10 +28,10 @@ impl Plugin for CorePlugin {
         app.add_entity_map::<Id>()
             .add_plugin(NetworkingPlugin)
             .add_startup_system(init_networking.system())
+            .add_position_map::<Tile>()
             .add_event::<CreateGameEvent>()
             .add_event::<JoinGameEvent>()
             .add_event::<GameStartedEvent>()
-            .add_plugin(MapPlugin)
             .add_plugin(UnitPlugin)
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_create_game_event.system())
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_join_game_event.system())
