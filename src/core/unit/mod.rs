@@ -4,13 +4,13 @@ mod store;
 pub use components::*;
 pub use store::*;
 
-use super::{Message, GameState, PlayerType};
+use super::{GameState, Message, PlayerType};
 use crate::prelude::*;
 use bevy::prelude::*;
 use std::ops::Deref;
 
-use log::debug;
 use bevy_networking::{NetworkDelivery, NetworkResource};
+use log::debug;
 use std::net::SocketAddr;
 
 
@@ -26,7 +26,7 @@ impl Plugin for UnitPlugin {
             .add_system(handle_unit_cmd_system.system())
             .add_system(UnitStore::handle_position_changed.system())
             .add_system(UnitStore::handle_health_changed.system())
-            .add_system( handle_action_executed_system.system());
+            .add_system(handle_action_executed_system.system());
     }
 }
 
@@ -60,13 +60,17 @@ fn handle_unit_cmd_system(
                 let delivery = NetworkDelivery::ReliableSequenced(Some(1));
                 let message = Message::MoveRequest(id, pos.clone()).to_bytes().unwrap();
 
-                let remote_addr = game_state.players.iter().find_map(|(player_type, player_info)| -> Option<SocketAddr> {
-                    if let PlayerType::Remote(addr) = player_type {
-                        return Some(addr.clone());
-                    }
+                let remote_addr = game_state
+                    .players
+                    .iter()
+                    .find_map(|(player_type, player_info)| -> Option<SocketAddr> {
+                        if let PlayerType::Remote(addr) = player_type {
+                            return Some(addr.clone());
+                        }
 
-                    None
-                }).unwrap();
+                        None
+                    })
+                    .unwrap();
 
                 net.send(remote_addr, &message, delivery).unwrap();
                 action_events.send(ActionExecuted(*entity, *index, *pos));

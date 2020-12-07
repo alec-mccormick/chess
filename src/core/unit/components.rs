@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use bevy::prelude::*;
 use derive_more::{Deref, From, Into};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use super::store::UnitStore;
 

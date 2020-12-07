@@ -1,9 +1,8 @@
-use bevy::prelude::*;
-use serde::{Serialize, Deserialize};
-use uuid::Uuid;
-use super::unit::*;
-use super::map::*;
+use super::{map::*, unit::*};
 use crate::{prelude::*, units::*};
+use bevy::prelude::*;
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 
 /// ==========================================================================
@@ -68,13 +67,42 @@ impl Default for GameDescriptor {
 // -- Helper Functions
 // ==========================================================================
 fn convert_unit_descriptor_to_components((team, unit, position, id): (Team, Unit, Position, Id)) -> UnitComponents {
-
     match unit {
-        Unit::Pawn => UnitComponents { team, position, id, ..pawn() },
-        Unit::Bishop => UnitComponents { team, position, id, ..bishop() },
-        Unit::Knight => UnitComponents { team, position, id, ..knight() },
-        Unit::Rook => UnitComponents { team, position, id, ..rook() },
-        Unit::King => UnitComponents { team, position, id, ..king() },
-        Unit::Queen => UnitComponents { team, position, id, ..queen() }
+        Unit::Pawn => UnitComponents {
+            team,
+            position,
+            id,
+            ..pawn()
+        },
+        Unit::Bishop => UnitComponents {
+            team,
+            position,
+            id,
+            ..bishop()
+        },
+        Unit::Knight => UnitComponents {
+            team,
+            position,
+            id,
+            ..knight()
+        },
+        Unit::Rook => UnitComponents {
+            team,
+            position,
+            id,
+            ..rook()
+        },
+        Unit::King => UnitComponents {
+            team,
+            position,
+            id,
+            ..king()
+        },
+        Unit::Queen => UnitComponents {
+            team,
+            position,
+            id,
+            ..queen()
+        },
     }
 }

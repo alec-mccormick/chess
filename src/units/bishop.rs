@@ -16,7 +16,7 @@ pub fn bishop() -> UnitComponents {
         health: Health(1),
         position: Position::new(0, 0),
         actions: Actions(vec![Box::new(BishopMoveAction)]),
-        id: Id::from_uuid(uuid::Uuid::nil())
+        id: Id::from_uuid(uuid::Uuid::nil()),
     }
 }
 

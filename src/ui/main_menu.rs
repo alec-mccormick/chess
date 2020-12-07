@@ -2,10 +2,9 @@ use bevy::prelude::*;
 use log::{debug, info};
 
 use crate::{
-    core::{CreateGameEvent, PlayerInfo, Team},
+    core::{CreateGameEvent, JoinGameEvent, PlayerInfo, Team},
     prelude::*,
 };
-use crate::core::JoinGameEvent;
 
 
 pub struct CreateMainMenuEvent;
@@ -213,7 +212,7 @@ pub fn handle_join_button_pressed(
             name: "Player2".into(),
             team: Team::Black,
         },
-        server_addr: server_addr.parse().expect("Unable to parse socket address")
+        server_addr: server_addr.parse().expect("Unable to parse socket address"),
     });
 }
 

@@ -1,10 +1,7 @@
 use bevy::prelude::*;
+use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, fmt::Display};
 use uuid::Uuid;
-use serde::{Serialize, Deserialize};
-use std::{
-    collections::HashMap,
-    fmt::Display
-};
 
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
@@ -15,8 +12,13 @@ impl Id {
         Id(Uuid::new_v4())
     }
 
-    pub fn from_uuid(uuid: Uuid) -> Self { Id(uuid) }
-    pub fn to_uuid(&self) -> &Uuid { &self.0 }
+    pub fn from_uuid(uuid: Uuid) -> Self {
+        Id(uuid)
+    }
+
+    pub fn to_uuid(&self) -> &Uuid {
+        &self.0
+    }
 }
 
 
@@ -41,10 +43,7 @@ impl EntityIds {
     }
 }
 
-pub fn entity_ids_system(
-    mut entity_ids: ResMut<EntityIds>,
-    query: Query<(Entity, Changed<Id>)>
-) {
+pub fn entity_ids_system(mut entity_ids: ResMut<EntityIds>, query: Query<(Entity, Changed<Id>)>) {
     for (entity, id) in query.iter() {
         entity_ids.set(*id, entity);
     }

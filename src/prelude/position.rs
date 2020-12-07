@@ -1,9 +1,6 @@
 use bevy::prelude::*;
-use std::ops::{Add};
-use std::hash::Hash;
-use serde::{Serialize, Deserialize};
-use std::collections::HashMap;
-use std::marker::PhantomData;
+use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, hash::Hash, marker::PhantomData, ops::Add};
 
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Hash)]

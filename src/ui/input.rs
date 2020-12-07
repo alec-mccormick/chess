@@ -1,11 +1,13 @@
 use bevy::prelude::*;
-use bevy_networking::{NetworkResource, NetworkDelivery};
+use bevy_networking::{NetworkDelivery, NetworkResource};
 use log::info;
 
-use crate::prelude::*;
-use crate::core::{
-    unit::{is_action_valid, Actions, Health, Team, Unit, UnitCmd, UnitStore},
-    GameState, Tile,
+use crate::{
+    core::{
+        unit::{is_action_valid, Actions, Health, Team, Unit, UnitCmd, UnitStore},
+        GameState, Tile,
+    },
+    prelude::*,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -37,8 +39,7 @@ pub fn handle_tile_interaction(
 
                         let team = action_query.get_component::<Team>(*entity).unwrap();
 
-                        if team.eq(&game_state.active_team)
-                            && team.eq(&game_state.local_player_info.team) {
+                        if team.eq(&game_state.active_team) && team.eq(&game_state.local_player_info.team) {
                             info!("Unit for active team selected");
                             *input_state = InputState::UnitSelected(*entity);
                         } else {

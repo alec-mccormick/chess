@@ -1,22 +1,22 @@
 use bevy::prelude::*;
-use bevy_networking::{NetworkDelivery, NetworkResource, NetworkingPlugin, events::MessageReceived};
+use bevy_networking::{events::MessageReceived, NetworkDelivery, NetworkResource, NetworkingPlugin};
 use log::{debug, info};
+use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
-use serde::{Serialize, Deserialize};
 
 
 use crate::{prelude::*, units::*};
 
+mod game;
 pub mod map;
 pub mod unit;
-mod game;
 
 pub use map::{Map, MapComponents, Tile, TileComponents};
-pub use unit::{Action, Actions, Health, Team, Unit, UnitCmd, UnitComponents, ActionExecuted};
+pub use unit::{Action, ActionExecuted, Actions, Health, Team, Unit, UnitCmd, UnitComponents};
 
+use game::GameDescriptor;
 use map::MapPlugin;
 use unit::UnitPlugin;
-use game::GameDescriptor;
 
 
 /// ==========================================================================
@@ -26,10 +26,8 @@ use game::GameDescriptor;
 pub struct CorePlugin;
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app
-            .init_resource::<EntityIds>()
+        app.init_resource::<EntityIds>()
             .add_system_to_stage(stage::POST_UPDATE, entity_ids_system.system())
-
             .add_plugin(NetworkingPlugin)
             .add_startup_system(init_networking.system())
             .add_event::<CreateGameEvent>()
@@ -41,8 +39,7 @@ impl Plugin for CorePlugin {
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_join_game_event.system())
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_network_events.system())
             .add_resource(GameState::default())
-            .add_system(GameState::handle_unit_cmd.system())
-        ;
+            .add_system(GameState::handle_unit_cmd.system());
     }
 }
 
@@ -142,10 +139,10 @@ impl Game {
             match message {
                 Message::JoinRequest(player_info) => {
                     Self::handle_join_request(&mut commands, &mut state, &mut net, from, player_info);
-                },
+                }
                 Message::JoinResponse(player_info, game_descriptor) => {
                     Self::handle_join_response(&mut commands, &mut state, from, player_info, game_descriptor);
-                },
+                }
                 Message::MoveRequest(id, position) => {
                     println!("RECEIVED MOVE REQUEST: {:?} {:?}", id, position);
 
@@ -153,7 +150,7 @@ impl Game {
 
                     println!("Entity!: {:?}", entity);
                     action_executed_events.send(ActionExecuted(entity.clone(), 0, position));
-                },
+                }
             }
         }
     }
@@ -176,7 +173,9 @@ impl Game {
 
         // Send response with local player info & game descriptor
         let delivery = NetworkDelivery::ReliableSequenced(Some(1));
-        let message = Message::JoinResponse(local_player_info, game_descriptor.clone()).to_bytes().unwrap();
+        let message = Message::JoinResponse(local_player_info, game_descriptor.clone())
+            .to_bytes()
+            .unwrap();
 
         net.send(from, &message, delivery).unwrap();
 
