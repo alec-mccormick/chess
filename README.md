@@ -5,10 +5,10 @@ turn-based game written in Rust with Bevy engine.
 
 Run the following commands to launch:
 ```
-# Launch application with the title "Chess A" to act as the server.
+# Launch application with the title "Chess A".
 $ cargo run -- --port 12351 --title "Chess A"
 
-# Launch application with the title "Chess B" to act as the client & configure it to connect.
+# Launch application with the title "Chess B" & configure it to connect to "Chess A".
 $ cargo run -- --port 12350 --title "Chess B" --remote "127.0.0.1:12351"
 ```
 
@@ -36,7 +36,6 @@ Set the environment variable RUST_LOG="chess=debug" for debug logs.
 - [ ] Migrate to animated sprites
 - [ ] Show movable squares on hover
 - [ ] Add Bot AI
-- [ ] 
 - [x] Add startup screen
     - [ ] Allow user to select team
 - [ ] Build Action UI
