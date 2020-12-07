@@ -5,8 +5,8 @@ use bevy::prelude::*;
 pub const TILE_RENDER_WIDTH_PX: i32 = 56;
 pub const TILE_RENDER_HEIGHT_PX: i32 = 42;
 
-pub const HALF_TILE_RENDER_WIDTH_PX: i32 = TILE_RENDER_WIDTH_PX / 2;
-pub const HALF_TILE_RENDER_HEIGHT_PX: i32 = TILE_RENDER_HEIGHT_PX / 2;
+pub const HALF_TILE_RENDER_WIDTH_PX: i32 = TILE_RENDER_WIDTH_PX/2;
+pub const HALF_TILE_RENDER_HEIGHT_PX: i32 = TILE_RENDER_HEIGHT_PX/2;
 
 
 pub fn convert_position_to_vec2(pos: &Position) -> Vec2 {

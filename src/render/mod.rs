@@ -21,7 +21,7 @@ impl Plugin for RenderPlugin {
 
 
 fn setup(mut commands: Commands) {
-    let mut camera = Camera2dComponents::default();
+    let camera = Camera2dComponents::default();
     // camera.transform.scale = Vec3::splat(0.8);
 
     commands.spawn(camera).with(map::GameCamera);

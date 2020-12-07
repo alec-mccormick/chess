@@ -1,4 +1,3 @@
-mod commands_extension;
 mod dimensions;
 mod entity_spawner;
 mod id;
@@ -8,7 +7,6 @@ mod transform;
 mod entity_map;
 
 
-pub use commands_extension::*;
 pub use dimensions::*;
 pub use entity_spawner::*;
 pub use id::*;

@@ -19,8 +19,8 @@ pub struct MapDescriptor {
     tiles: Vec<(Tile, Position)>,
 }
 
-impl EntitySpawner for MapDescriptor {
-    fn spawn(self, commands: &mut Commands) -> &mut Commands {
+impl SpawnWithCommands for MapDescriptor {
+    fn spawn_with_commands(self, commands: &mut Commands) -> &mut Commands {
         let MapDescriptor { dimensions, tiles } = self;
 
         let map = MapComponents {
@@ -30,10 +30,7 @@ impl EntitySpawner for MapDescriptor {
 
         commands.spawn(map).with_children(|commands| {
             for (tile, position) in tiles.into_iter() {
-                let mut labels = Labels::default();
-                labels.insert(format!("tile:{},{}", position.x, position.y));
-
-                commands.spawn(TileComponents { tile, position, labels });
+                commands.spawn(TileComponents { tile, position });
             }
         })
     }

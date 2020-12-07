@@ -85,7 +85,8 @@ impl<T> PositionMap<T> {
 pub fn handle_position_changed_system<T>(
     mut position_map: ResMut<PositionMap<T>>,
     query: Query<With<T, (Entity, Changed<Position>)>>,
-) where T: Send + Sync + 'static {
+) where T: Send + Sync + 'static
+{
     for (entity, position) in query.iter() {
         position_map.set(*position, entity);
     }
@@ -94,7 +95,7 @@ pub fn handle_position_changed_system<T>(
 // TODO: HANDLE DESPAWNING
 
 // ==========================================================================
-// --- AddEntityMap
+// --- AddPositionMap
 // ==========================================================================
 pub trait AddPositionMap {
     fn add_position_map<T>(&mut self) -> &mut Self

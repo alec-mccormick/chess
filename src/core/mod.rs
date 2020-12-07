@@ -177,7 +177,7 @@ impl Game {
         net.send(from, &message, delivery).unwrap();
 
         info!("handle_join_request() - join response sent");
-        game_descriptor.spawn(commands);
+        game_descriptor.spawn_with_commands(commands);
     }
 
     fn handle_join_response(
@@ -193,7 +193,7 @@ impl Game {
         state.players.push((PlayerType::Remote(from), player_info));
 
         // Spawn game & move starting state to complete
-        game_descriptor.spawn(commands);
+        game_descriptor.spawn_with_commands(commands);
     }
 }
 

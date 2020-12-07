@@ -27,15 +27,15 @@ struct MainMenuSpawner {
     join_button: MainMenuButtonSpawner,
 }
 
-impl EntitySpawner for MainMenuSpawner {
-    fn spawn(self, commands: &mut Commands) -> &mut Commands {
+impl SpawnWithCommands for MainMenuSpawner {
+    fn spawn_with_commands(self, commands: &mut Commands) -> &mut Commands {
         commands
             .spawn(Self::node_components())
             .with(MainMenu)
             .with_children(|commands| {
-                self.start_button.spawn_as_child(commands).with(StartButton);
+                self.start_button.spawn_with_child_builder(commands).with(StartButton);
 
-                self.join_button.spawn_as_child(commands).with(JoinButton);
+                self.join_button.spawn_with_child_builder(commands).with(JoinButton);
             })
     }
 }
@@ -73,8 +73,8 @@ struct MainMenuButtonSpawner {
     text: &'static str,
 }
 
-impl ChildEntitySpawner for MainMenuButtonSpawner {
-    fn spawn_as_child<'a, 'b>(self, commands: &'a mut ChildBuilder<'b>) -> &'a mut ChildBuilder<'b> {
+impl SpawnWithChildBuilder for MainMenuButtonSpawner {
+    fn spawn_with_child_builder<'a, 'b>(self, commands: &'a mut ChildBuilder<'b>) -> &'a mut ChildBuilder<'b> {
         commands
             .spawn(self.button_components())
             .with(MainMenuButton)
@@ -134,7 +134,7 @@ pub fn handle_create_main_menu_event(
 ) {
     for _ in reader.iter(&events) {
         info!("handle_create_main_menu_event()");
-        MainMenuSpawner::new(&main_menu_materials).spawn(&mut commands);
+        MainMenuSpawner::new(&main_menu_materials).spawn_with_commands(&mut commands);
     }
 }
 

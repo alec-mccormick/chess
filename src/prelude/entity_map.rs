@@ -96,6 +96,7 @@ pub fn handle_key_changed_system<T>(
 // ==========================================================================
 // --- AddEntityMap
 // ==========================================================================
+
 pub trait AddEntityMap {
     fn add_entity_map<T>(&mut self) -> &mut Self
         where T: Hash + Eq + Clone + Send + Sync + 'static;

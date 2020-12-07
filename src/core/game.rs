@@ -14,11 +14,11 @@ pub struct GameDescriptor {
     pub units: Vec<(Team, Unit, Position, Id)>,
 }
 
-impl EntitySpawner for GameDescriptor {
-    fn spawn(self, commands: &mut Commands) -> &mut Commands {
+impl SpawnWithCommands for GameDescriptor {
+    fn spawn_with_commands(self, commands: &mut Commands) -> &mut Commands {
         let GameDescriptor { map, units } = self;
 
-        map.spawn(commands).with_children(|commands| {
+        map.spawn_with_commands(commands).with_children(|commands| {
             for descriptor in units.into_iter() {
                 let components = convert_unit_descriptor_to_components(descriptor);
                 commands.spawn(components);
