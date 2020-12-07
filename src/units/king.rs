@@ -16,7 +16,7 @@ pub fn king() -> UnitComponents {
         health: Health(1),
         position: Position::new(0, 0),
         actions: Actions(vec![Box::new(KingMoveAction)]),
-        labels: Labels::default(),
+        id: Id::from_uuid(uuid::Uuid::nil()),
     }
 }
 

@@ -38,7 +38,7 @@ fn handle_unit_cmd_system(
     game_state: Res<GameState>,
     mut net: ResMut<NetworkResource>,
     action_query: Query<(&Unit, &Position, &Team, &Health, &Actions)>,
-    labels_query: Query<(Entity, &Labels)>,
+    id_query: Query<(Entity, &Id)>,
 ) {
     for cmd in reader.iter(&events) {
         debug!("handle_unit_cmd() {:?}", cmd);
@@ -53,14 +53,9 @@ fn handle_unit_cmd_system(
                     return;
                 }
 
-                let labels = labels_query.get_component::<Labels>(entity.clone()).unwrap();
+                let &id = id_query.get_component::<Id>(*entity).unwrap();
 
-                let id = labels.iter().find_map(|label| {
-                    let label = String::from(label);
-                    if label.starts_with("id:") { Some(label) } else { None }
-                }).unwrap();
-
-                debug!("handle_unit_cmd() - unit id: {}", id);
+                debug!("handle_unit_cmd() - unit id: {:?}", id);
 
                 let delivery = NetworkDelivery::ReliableSequenced(Some(1));
                 let message = Message::MoveRequest(id, pos.clone()).to_bytes().unwrap();
@@ -73,7 +68,7 @@ fn handle_unit_cmd_system(
                     None
                 }).unwrap();
 
-                net.send(remote_addr, &message, delivery);
+                net.send(remote_addr, &message, delivery).unwrap();
                 action_events.send(ActionExecuted(*entity, *index, *pos));
             }
         }

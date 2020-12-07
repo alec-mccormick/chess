@@ -13,7 +13,7 @@ pub struct UnitComponents {
     pub health: Health,
     pub position: Position,
     pub actions: Actions,
-    pub labels: Labels,
+    pub id: Id,
 }
 
 

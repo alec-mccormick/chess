@@ -1,5 +1,8 @@
-use std::ops::{Add, Deref};
+use std::ops::{Add};
+use bevy::prelude::Entity;
+use std::hash::Hash;
 use serde::{Serialize, Deserialize};
+use std::collections::HashMap;
 
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Hash)]
@@ -36,3 +39,10 @@ impl From<&(i32, i32)> for Position {
         Position::new(*x, *y)
     }
 }
+
+// pub struct PositionMap<T>
+//     where T: Hash + Eq {
+//
+//     position_to_entity: HashMap<Position, Entity>,
+//     entity_to_position: HashMap<Entity, Position>
+// }

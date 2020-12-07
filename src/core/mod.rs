@@ -27,7 +27,9 @@ pub struct CorePlugin;
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
-            // .add_resource(GameStartingState::Default)
+            .init_resource::<EntityIds>()
+            .add_system_to_stage(stage::POST_UPDATE, entity_ids_system.system())
+
             .add_plugin(NetworkingPlugin)
             .add_startup_system(init_networking.system())
             .add_event::<CreateGameEvent>()
@@ -39,7 +41,8 @@ impl Plugin for CorePlugin {
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_join_game_event.system())
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_network_events.system())
             .add_resource(GameState::default())
-            .add_system(GameState::handle_unit_cmd.system());
+            .add_system(GameState::handle_unit_cmd.system())
+        ;
     }
 }
 
@@ -126,7 +129,7 @@ impl Game {
         mut state: ResMut<GameState>,
         mut net: ResMut<NetworkResource>,
         mut action_executed_events: ResMut<Events<ActionExecuted>>,
-        query: Query<With<Unit, (Entity, &Labels)>>,
+        entity_ids: Res<EntityIds>,
     ) {
         for event in reader.iter(&events) {
             let MessageReceived(conn, data) = event;
@@ -144,16 +147,12 @@ impl Game {
                     Self::handle_join_response(&mut commands, &mut state, from, player_info, game_descriptor);
                 },
                 Message::MoveRequest(id, position) => {
-                    println!("RECEIVED MOVE REQUEST: {} {:?}", id, position);
+                    println!("RECEIVED MOVE REQUEST: {:?} {:?}", id, position);
 
-                    let entity = query.iter()
-                        .filter(|(_, labels)| labels.contains(id.clone()))
-                        .map(|(entity, _)| entity)
-                        .next()
-                        .unwrap();
+                    let entity = entity_ids.get_entity(&id).unwrap();
 
                     println!("Entity!: {:?}", entity);
-                    action_executed_events.send(ActionExecuted(entity, 0, position));
+                    action_executed_events.send(ActionExecuted(entity.clone(), 0, position));
                 },
             }
         }
@@ -215,7 +214,7 @@ impl Game {
 pub enum Message {
     JoinRequest(PlayerInfo),
     JoinResponse(PlayerInfo, GameDescriptor),
-    MoveRequest(String, Position),
+    MoveRequest(Id, Position),
 }
 
 impl Message {

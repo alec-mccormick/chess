@@ -17,9 +17,9 @@ To run in debug mode:
 - [x] Implement King
 - [x] Add robust logging
 - [x] Update rendering to isometric
-- [ ] Add Networking
-    - [ ] Serialize/deserialize board
-    - [ ] Serialize/deserialize messages 
+- [x] Add Networking
+    - [x] Serialize/deserialize board
+    - [x] Serialize/deserialize messages 
 - [ ] Migrate to using SpriteConfig
 - [ ] Add Bot AI
 - [ ] Show movable squares on hover
@@ -29,10 +29,10 @@ To run in debug mode:
     - [ ] Add Icon
     - [ ] Add Description
 - [ ] Add State Machine
-- [ ] Add events for action executed, etc.
+- [x] Add events for action executed, etc.
 - [ ] Update Action to no longer rely on Query
-    - [ ] Maintain internal list of all units in UnitStore?
-    - [ ] Migrate to ObjectId
+    - [x] Maintain internal list of all units in UnitStore?
+    - [x] Migrate to ObjectId
 
 
 ### Gameplay Thoughts
