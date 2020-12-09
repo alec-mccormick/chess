@@ -5,6 +5,7 @@ mod position;
 mod sprite;
 mod transform;
 mod entity_map;
+mod constants;
 
 
 pub use dimensions::*;
@@ -14,3 +15,4 @@ pub use position::*;
 pub use sprite::*;
 pub use transform::*;
 pub use entity_map::*;
+pub use constants::*;

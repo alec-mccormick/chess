@@ -2,11 +2,10 @@ use crate::prelude::*;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
-mod map;
+
 mod tile;
 
 
-pub use map::*;
 pub use tile::*;
 
 
@@ -28,7 +27,8 @@ impl SpawnWithCommands for MapDescriptor {
             ..Default::default()
         };
 
-        commands.spawn(map).with_children(|commands| {
+        commands.spawn(map)
+            .with_children(|commands| {
             for (tile, position) in tiles.into_iter() {
                 commands.spawn(TileComponents { tile, position });
             }
@@ -53,3 +53,23 @@ impl Default for MapDescriptor {
         MapDescriptor { dimensions, tiles }
     }
 }
+
+
+
+#[derive(Debug, Bundle)]
+pub struct MapComponents {
+    pub map: Map,
+    pub dimensions: Dimensions,
+}
+
+impl Default for MapComponents {
+    fn default() -> Self {
+        MapComponents {
+            map: Map,
+            dimensions: Dimensions::new(8, 8),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct Map;
