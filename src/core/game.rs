@@ -20,8 +20,7 @@ impl SpawnWithCommands for GameDescriptor {
 
         map.spawn_with_commands(commands).with_children(|commands| {
             for descriptor in units.into_iter() {
-                let components = convert_unit_descriptor_to_components(descriptor);
-                commands.spawn(components);
+                commands.spawn(UnitComponents::from(descriptor));
             }
         })
     }
@@ -66,43 +65,16 @@ impl Default for GameDescriptor {
 // ==========================================================================
 // -- Helper Functions
 // ==========================================================================
-fn convert_unit_descriptor_to_components((team, unit, position, id): (Team, Unit, Position, Id)) -> UnitComponents {
-    match unit {
-        Unit::Pawn => UnitComponents {
-            team,
-            position,
-            id,
-            ..pawn()
-        },
-        Unit::Bishop => UnitComponents {
-            team,
-            position,
-            id,
-            ..bishop()
-        },
-        Unit::Knight => UnitComponents {
-            team,
-            position,
-            id,
-            ..knight()
-        },
-        Unit::Rook => UnitComponents {
-            team,
-            position,
-            id,
-            ..rook()
-        },
-        Unit::King => UnitComponents {
-            team,
-            position,
-            id,
-            ..king()
-        },
-        Unit::Queen => UnitComponents {
-            team,
-            position,
-            id,
-            ..queen()
-        },
+impl From<(Team, Unit, Position, Id)> for UnitComponents {
+    fn from((team, unit, position, id): (Team, Unit, Position, Id)) -> Self {
+
+        match unit {
+            Unit::Pawn => UnitComponents { team, position, id, ..pawn() },
+            Unit::Bishop => UnitComponents { team, position, id, ..bishop() },
+            Unit::Knight => UnitComponents { team, position, id, ..knight() },
+            Unit::Rook => UnitComponents { team, position, id, ..rook() },
+            Unit::King => UnitComponents { team, position, id, ..king() },
+            Unit::Queen => UnitComponents { team, position, id, ..queen() },
+        }
     }
 }

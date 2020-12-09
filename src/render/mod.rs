@@ -1,5 +1,4 @@
 pub mod map;
-pub mod unit;
 pub(crate) mod utils;
 
 use crate::prelude::*;
@@ -13,7 +12,6 @@ pub struct RenderPlugin;
 impl Plugin for RenderPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_plugin(map::RenderMapPlugin)
-            .add_plugin(unit::RenderUnitPlugin)
             .add_startup_system(setup.system())
             .add_system_to_stage(stage::POST_UPDATE, handle_position_update.system());
     }
@@ -22,12 +20,9 @@ impl Plugin for RenderPlugin {
 
 fn setup(mut commands: Commands) {
     let camera = Camera2dComponents::default();
-    // camera.transform.scale = Vec3::splat(0.8);
 
     commands.spawn(camera).with(map::GameCamera);
-    // let map_offset = (7 * utils::HALF_TILE_RENDER_HEIGHT_PX) as f32 * 2.5;
-    // let start = (window.width as f32 / 2.0) - map_offset - (2 * utils::HALF_TILE_RENDER_HEIGHT_PX as f32);
-    // println!("!!! Window width: {}, map_offset: {}, start: {}", window.width, map_offset, start);
+
 }
 
 

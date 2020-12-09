@@ -91,18 +91,22 @@ fn handle_tile_spawned(
     }
 }
 
-
-/// ==========================================================================
-/// Tile Overlay
-/// ==========================================================================
-#[derive(Debug)]
-pub struct TileOverlay;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TileOverlayState {
     Invisible,
     Visible,
 }
+
+/// ==========================================================================
+/// Tile Overlay
+/// ==========================================================================
+pub struct TileOverlayComponents {
+    overlay: TileOverlay,
+}
+
+#[derive(Debug)]
+pub struct TileOverlay;
+
 
 impl TileOverlay {
     fn spawn(

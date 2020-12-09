@@ -2,9 +2,9 @@ use bevy::prelude::*;
 use std::{collections::HashMap, hash::Hash};
 
 
-// ==========================================================================
-// --- EntityMap
-// ==========================================================================
+/// EntityMap is a data structure for looking up spawned entities by a key type K.
+///
+/// It is primarily used in game for finding entities by Id or Position.
 #[derive(Debug)]
 pub struct EntityMap<K> {
     key_to_entity: HashMap<K, Entity>,
@@ -20,9 +20,7 @@ impl<K> Default for EntityMap<K> {
     }
 }
 
-impl<K> EntityMap<K>
-    where K: Hash + Eq + Clone + Send + Sync + 'static
-{
+impl<K> EntityMap<K> where K: Eq + Hash + Clone {
     pub fn get(&self, key: &K) -> Option<&Entity> {
         self.key_to_entity.get(key)
     }
@@ -80,11 +78,11 @@ impl<K> EntityMap<K>
 // ==========================================================================
 // --- Systems
 // ==========================================================================
-pub fn handle_key_changed_system<T>(
-    mut entity_map: ResMut<EntityMap<T>>,
-    query: Query<(Entity, Changed<T>)>
+pub fn handle_key_changed_system<K>(
+    mut entity_map: ResMut<EntityMap<K>>,
+    query: Query<(Entity, Changed<K>)>
 )
-    where T: Hash + Eq + Clone + Send + Sync + 'static {
+    where K: Hash + Eq + Clone + Send + Sync + 'static {
     for (entity, key) in query.iter() {
         entity_map.set(key.clone(), entity);
     }
@@ -92,22 +90,19 @@ pub fn handle_key_changed_system<T>(
 
 // TODO: HANDLE DESPAWNING
 
-
-// ==========================================================================
-// --- AddEntityMap
-// ==========================================================================
-
+/// An AppBuilder extension which initializes an EntityMap for a key type K and adds the
+/// systems to handle component updates.
 pub trait AddEntityMap {
-    fn add_entity_map<T>(&mut self) -> &mut Self
-        where T: Hash + Eq + Clone + Send + Sync + 'static;
+    fn add_entity_map<K>(&mut self) -> &mut Self
+        where K: Hash + Eq + Copy + Send + Sync + 'static;
 }
 
 impl AddEntityMap for AppBuilder {
 
-    fn add_entity_map<T>(&mut self) -> &mut Self
-        where T: Hash + Eq + Clone + Send + Sync + 'static
+    fn add_entity_map<K>(&mut self) -> &mut Self
+        where K: Hash + Eq + Clone + Send + Sync + 'static
     {
-        self.add_resource(EntityMap::<T>::default())
-            .add_system_to_stage(stage::POST_UPDATE, handle_key_changed_system::<T>.system())
+        self.add_resource(EntityMap::<K>::default())
+            .add_system_to_stage(stage::POST_UPDATE, handle_key_changed_system::<K>.system())
     }
 }
