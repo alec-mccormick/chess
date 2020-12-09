@@ -1,13 +1,16 @@
 use crate::prelude::*;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
-
+use log::{debug, trace};
 
 mod tile;
 
 
 pub use tile::*;
+use crate::core::AppConfig;
 
+
+pub struct GameCamera;
 
 // ==========================================================================
 // MapSpawner
@@ -54,6 +57,39 @@ impl Default for MapDescriptor {
     }
 }
 
+
+/// ==========================================================================
+/// Map Rendering
+/// ==========================================================================
+pub fn handle_map_spawned(
+    mut commands: Commands,
+    app_config: Res<AppConfig>,
+    query: Query<(Entity, &Dimensions, Added<Map>)>
+) {
+    for (entity, dimensions, _map) in query.iter() {
+        debug!("handle_map_spawned() - Insert Mesh components for rendering");
+
+        let scale = Vec3::splat(app_config.scale * 2.5);
+        let translation = convert_dimensions_to_map_offset(dimensions) * scale;
+
+        commands.insert(
+            entity,
+            MeshComponents {
+                transform: Transform {
+                    translation,
+                    scale,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        );
+    }
+}
+
+fn convert_dimensions_to_map_offset(dimensions: &Dimensions) -> Vec3 {
+    let x = ((dimensions.width + dimensions.height - 2) * HALF_TILE_RENDER_WIDTH_PX) as f32;
+    Vec3::new(-x / 2.0, 0.0, 0.0)
+}
 
 
 #[derive(Debug, Bundle)]

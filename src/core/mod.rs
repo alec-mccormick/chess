@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_networking::{events::MessageReceived, NetworkDelivery, NetworkResource, NetworkingPlugin};
-use log::{debug, info};
+use log::{debug, info, trace};
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 
@@ -32,6 +32,15 @@ impl Plugin for CorePlugin {
             .add_event::<JoinGameEvent>()
             .add_event::<GameStartedEvent>()
             .add_plugin(UnitPlugin)
+
+            .init_resource::<map::TileMaterials>()
+            .add_system(map::handle_tile_spawned.system())
+            .add_system(map::handle_map_spawned.system())
+            .add_system(map::handle_tile_overlay_state_change.system())
+
+            .add_system_to_stage(stage::POST_UPDATE, handle_position_update.system())
+            .add_startup_system(setup.system())
+
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_create_game_event.system())
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_join_game_event.system())
             .add_system_to_stage(bevy::scene::SCENE_STAGE, Game::handle_network_events.system())
@@ -40,10 +49,11 @@ impl Plugin for CorePlugin {
     }
 }
 
-// fn init_networking(server_bind_addr: Res<ServerBindAddr>, mut net: ResMut<NetworkResource>) {
-//     info!("Binding to address: {:?}", server_bind_addr.0);
-//     net.bind(server_bind_addr.0).unwrap();
-// }
+fn setup(mut commands: Commands) {
+    let camera = Camera2dComponents::default();
+
+    commands.spawn(camera).with(map::GameCamera);
+}
 
 /// ==========================================================================
 /// Game
@@ -72,6 +82,28 @@ pub struct PlayerInfo {
 pub enum PlayerType {
     Local,
     Remote(SocketAddr),
+}
+
+
+fn handle_position_update(mut query: Query<(Changed<Position>, &mut Transform, Option<&TransformOffset>)>) {
+    for (position, mut transform, transform_offset) in query.iter_mut() {
+        trace!("handle_position_update() - Update x,y translation: {:?}", *position);
+
+        let z = (7 + position.x - position.y) as f32 / 14.0;
+
+        let translation = convert_position_to_vec2(&*position).extend(z);
+
+        transform.translation = match transform_offset {
+            Some(offset) => translation + offset.0,
+            None => translation,
+        };
+    }
+}
+
+fn convert_position_to_vec2(pos: &Position) -> Vec2 {
+    let x = ((pos.y + pos.x) * HALF_TILE_RENDER_WIDTH_PX) as f32;
+    let y = ((pos.y - pos.x) * HALF_TILE_RENDER_HEIGHT_PX) as f32;
+    Vec2::new(x, y)
 }
 
 

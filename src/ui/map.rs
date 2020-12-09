@@ -10,11 +10,7 @@ use crate::core::{
 use log::info;
 use std::cmp::Ordering;
 
-use crate::render::{
-    map::{TileMaterials, TileOverlayState},
-    utils::HALF_TILE_RENDER_WIDTH_PX,
-};
-
+use crate::core::map::{TileMaterials, TileOverlayState};
 use super::input::InputState;
 use std::ops::Deref;
 

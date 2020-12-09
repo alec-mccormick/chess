@@ -7,7 +7,6 @@ use std::net::SocketAddr;
 
 use chess::{
     core::{CorePlugin, AppConfig},
-    render::RenderPlugin,
     ui::UIPlugin,
 };
 
@@ -69,7 +68,6 @@ fn main() {
         .add_plugin(NetworkingPlugin)
         .add_plugin(CorePlugin)
         .add_plugin(UIPlugin)
-        .add_plugin(RenderPlugin)
         .add_startup_system(setup.system())
         .run();
 }

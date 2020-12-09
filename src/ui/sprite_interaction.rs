@@ -3,10 +3,7 @@ use bevy::prelude::*;
 
 use log::trace;
 
-use crate::{
-    core::Tile,
-    render::utils::{HALF_TILE_RENDER_HEIGHT_PX, HALF_TILE_RENDER_WIDTH_PX},
-};
+use crate::core::Tile;
 
 
 #[derive(Default)]
