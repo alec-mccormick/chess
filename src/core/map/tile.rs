@@ -1,6 +1,8 @@
 use crate::prelude::*;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
+use strum::derive::Display;
+
 
 use std::collections::HashMap;
 
@@ -11,17 +13,8 @@ pub struct TileComponents {
     pub position: Position,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Display)]
 pub enum Tile {
     Black,
     White,
-}
-
-impl ToString for Tile {
-    fn to_string(&self) -> String {
-        match self {
-            Self::Black => "Black".into(),
-            Self::White => "White".into(),
-        }
-    }
 }
