@@ -1,4 +1,4 @@
-#unstable_features = true
+unstable_features = true
 merge_imports = true
 use_field_init_shorthand = true
 use_try_shorthand = true
@@ -9,3 +9,5 @@ empty_item_single_line = false
 blank_lines_lower_bound = 0
 blank_lines_upper_bound = 2
 max_width = 120
+struct_lit_width = 36
+struct_lit_single_line = false
