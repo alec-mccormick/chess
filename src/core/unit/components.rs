@@ -19,7 +19,7 @@ pub struct UnitComponents {
 // ==============================================================================
 // --- Components
 // ==============================================================================
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, Display)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Display)]
 pub enum Unit {
     Pawn,
     Bishop,
@@ -29,7 +29,7 @@ pub enum Unit {
     Queen,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Display)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Display, PartialEq, Eq)]
 pub enum Team {
     White,
     Black,
