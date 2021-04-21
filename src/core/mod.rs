@@ -36,8 +36,8 @@ impl Plugin for CorePlugin {
             .init_resource::<map::TileMaterials>()
             .add_system(map::handle_tile_spawned.system())
             .add_system(map::handle_map_spawned.system())
-            .add_system(map::handle_tile_overlay_state_change.system())
-
+            .add_system_to_stage(stage::POST_UPDATE, map::handle_tile_overlay_state_change.system())
+s
             .add_system_to_stage(stage::POST_UPDATE, handle_position_update.system())
             .add_startup_system(setup.system())
 
