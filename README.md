@@ -4,13 +4,19 @@ This project's primary role is to serve as a framework for an isometric
 turn-based game written in Rust with Bevy engine.
 
 Run the following commands to launch:
-```
-# Launch application with the title "Chess A".
-$ cargo run -- --port 12351 --title "Chess A"
 
-# Launch application with the title "Chess B" & configure it to connect to "Chess A".
+1. Launch the first client on port 12351 with the title "Chess A".
+```bash
+$ cargo run -- --port 12351 --title "Chess A"
+```
+
+2. Launch second client on port 12350 with the title "Chess B" & configure it to connect to client "Chess A".
+```bash
 $ cargo run -- --port 12350 --title "Chess B" --remote "127.0.0.1:12351"
 ```
+
+3. Launch a game on the first client by pressing "Start"
+4. Join the created game on the second client by pressing "Join"
 
 
 Set the environment variable RUST_LOG="chess=debug" for debug logs.
